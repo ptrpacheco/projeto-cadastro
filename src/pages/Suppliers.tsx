@@ -469,39 +469,14 @@ const Suppliers = () => {
                 />
                 <InputTelephone
                   label="Telefones"
-                  tipo={supplierData.telefones?.[0]?.tipo ?? ""}
-                  ddd={supplierData.telefones?.[0]?.ddd ?? 0}
-                  numero={supplierData.telefones?.[0]?.numero ?? 0}
-                  onTipoChange={(e) => {
-                    const updatedTelefones = supplierData.telefones.length
-                      ? [...supplierData.telefones]
-                      : [{ tipo: "", ddd: 0, numero: 0 }];
-                    updatedTelefones[0].tipo = e.target.value;
+                  placeholder="Digite o telefone..."
+                  value={supplierData.telefones}
+                  onChange={(newTelefones) =>
                     setSupplierData({
                       ...supplierData,
-                      telefones: updatedTelefones,
-                    });
-                  }}
-                  onDDDChange={(e) => {
-                    const updatedTelefones = supplierData.telefones.length
-                      ? [...supplierData.telefones]
-                      : [{ tipo: "", ddd: 0, numero: 0 }];
-                    updatedTelefones[0].ddd = parseInt(e.target.value);
-                    setSupplierData({
-                      ...supplierData,
-                      telefones: updatedTelefones,
-                    });
-                  }}
-                  onNumeroChange={(e) => {
-                    const updatedTelefones = supplierData.telefones.length
-                      ? [...supplierData.telefones]
-                      : [{ tipo: "", ddd: 0, numero: 0 }];
-                    updatedTelefones[0].numero = parseInt(e.target.value);
-                    setSupplierData({
-                      ...supplierData,
-                      telefones: updatedTelefones,
-                    });
-                  }}
+                      telefones: newTelefones,
+                    })
+                  }
                 />
               </div>
               <div className="w-full flex flex-row justify-between items-center p-4 border-t border-gray">
@@ -702,39 +677,14 @@ const Suppliers = () => {
                 />
                 <InputTelephone
                   label="Telefones"
-                  tipo={supplierData.telefones?.[0]?.tipo ?? ""}
-                  ddd={supplierData.telefones?.[0]?.ddd ?? 0}
-                  numero={supplierData.telefones?.[0]?.numero ?? 0}
-                  onTipoChange={(e) => {
-                    const updatedTelefones = supplierData.telefones.length
-                      ? [...supplierData.telefones]
-                      : [{ tipo: "", ddd: 0, numero: 0 }];
-                    updatedTelefones[0].tipo = e.target.value;
+                  placeholder="Digite o telefone..."
+                  value={supplierData.telefones}
+                  onChange={(newTelefones) =>
                     setSupplierData({
                       ...supplierData,
-                      telefones: updatedTelefones,
-                    });
-                  }}
-                  onDDDChange={(e) => {
-                    const updatedTelefones = supplierData.telefones.length
-                      ? [...supplierData.telefones]
-                      : [{ tipo: "", ddd: 0, numero: 0 }];
-                    updatedTelefones[0].ddd = parseInt(e.target.value);
-                    setSupplierData({
-                      ...supplierData,
-                      telefones: updatedTelefones,
-                    });
-                  }}
-                  onNumeroChange={(e) => {
-                    const updatedTelefones = supplierData.telefones.length
-                      ? [...supplierData.telefones]
-                      : [{ tipo: "", ddd: 0, numero: 0 }];
-                    updatedTelefones[0].numero = parseInt(e.target.value);
-                    setSupplierData({
-                      ...supplierData,
-                      telefones: updatedTelefones,
-                    });
-                  }}
+                      telefones: newTelefones,
+                    })
+                  }
                 />
               </div>
               <div className="w-full flex flex-row gap-4 justify-between items-center p-4 border-t border-gray">

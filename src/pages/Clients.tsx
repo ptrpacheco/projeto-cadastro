@@ -66,7 +66,7 @@ const Clients = () => {
     }
   };
 
-  const fetchClientByCpf = async (cpfOuCnpj: string) => {
+  const fetchPostById = async (cpfOuCnpj: string) => {
     try {
       const response = await axiosPrivate.get(`/cliente/${cpfOuCnpj}`);
       setClientData(response.data.data);
@@ -276,7 +276,7 @@ const Clients = () => {
                       </div>
                       <div className="flex flex-row gap-1">
                         <EditButton
-                          onClick={() => fetchClientByCpf(ClientData.cpfOuCnpj)}
+                          onClick={() => fetchPostById(ClientData.cpfOuCnpj)}
                         />
                       </div>
                     </li>
@@ -465,39 +465,11 @@ const Clients = () => {
                 />
                 <InputTelephone
                   label="Telefones"
-                  tipo={clientData.telefones?.[0]?.tipo ?? ""}
-                  ddd={clientData.telefones?.[0]?.ddd ?? 0}
-                  numero={clientData.telefones?.[0]?.numero ?? 0}
-                  onTipoChange={(e) => {
-                    const updatedTelefones = clientData.telefones.length
-                      ? [...clientData.telefones]
-                      : [{ tipo: "", ddd: 0, numero: 0 }];
-                    updatedTelefones[0].tipo = e.target.value;
-                    setClientData({
-                      ...clientData,
-                      telefones: updatedTelefones,
-                    });
-                  }}
-                  onDDDChange={(e) => {
-                    const updatedTelefones = clientData.telefones.length
-                      ? [...clientData.telefones]
-                      : [{ tipo: "", ddd: 0, numero: 0 }];
-                    updatedTelefones[0].ddd = parseInt(e.target.value);
-                    setClientData({
-                      ...clientData,
-                      telefones: updatedTelefones,
-                    });
-                  }}
-                  onNumeroChange={(e) => {
-                    const updatedTelefones = clientData.telefones.length
-                      ? [...clientData.telefones]
-                      : [{ tipo: "", ddd: 0, numero: 0 }];
-                    updatedTelefones[0].numero = parseInt(e.target.value);
-                    setClientData({
-                      ...clientData,
-                      telefones: updatedTelefones,
-                    });
-                  }}
+                  placeholder="Digite o telefone..."
+                  value={clientData.telefones}
+                  onChange={(newTelefones) =>
+                    setClientData({ ...clientData, telefones: newTelefones })
+                  }
                 />
               </div>
               <div className="w-full flex flex-row justify-between items-center p-4 border-t border-gray">
@@ -698,39 +670,11 @@ const Clients = () => {
                 />
                 <InputTelephone
                   label="Telefones"
-                  tipo={clientData.telefones?.[0]?.tipo ?? ""}
-                  ddd={clientData.telefones?.[0]?.ddd ?? 0}
-                  numero={clientData.telefones?.[0]?.numero ?? 0}
-                  onTipoChange={(e) => {
-                    const updatedTelefones = clientData.telefones.length
-                      ? [...clientData.telefones]
-                      : [{ tipo: "", ddd: 0, numero: 0 }];
-                    updatedTelefones[0].tipo = e.target.value;
-                    setClientData({
-                      ...clientData,
-                      telefones: updatedTelefones,
-                    });
-                  }}
-                  onDDDChange={(e) => {
-                    const updatedTelefones = clientData.telefones.length
-                      ? [...clientData.telefones]
-                      : [{ tipo: "", ddd: 0, numero: 0 }];
-                    updatedTelefones[0].ddd = parseInt(e.target.value);
-                    setClientData({
-                      ...clientData,
-                      telefones: updatedTelefones,
-                    });
-                  }}
-                  onNumeroChange={(e) => {
-                    const updatedTelefones = clientData.telefones.length
-                      ? [...clientData.telefones]
-                      : [{ tipo: "", ddd: 0, numero: 0 }];
-                    updatedTelefones[0].numero = parseInt(e.target.value);
-                    setClientData({
-                      ...clientData,
-                      telefones: updatedTelefones,
-                    });
-                  }}
+                  placeholder="Digite o telefone..."
+                  value={clientData.telefones}
+                  onChange={(newTelefones) =>
+                    setClientData({ ...clientData, telefones: newTelefones })
+                  }
                 />
               </div>
               <div className="w-full flex flex-row gap-4 justify-between items-center p-4 border-t border-gray">
