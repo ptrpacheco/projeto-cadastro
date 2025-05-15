@@ -5,8 +5,7 @@ import type { EnterpriseData } from "../interface/EnterpriseData";
 
 const Header = () => {
   const [posts, setPosts] = useState<EnterpriseData[]>([]);
-    const [error, setError] = useState();
-    const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -20,8 +19,8 @@ const Header = () => {
         });
         console.log(response.data);
         isMounted && setPosts(response.data.data);
-      } catch (e: any) {
-        setError(e);
+      } catch (error) {
+        console.error("Erro ao listar empresa: ", error);
       }
 
       setIsLoading(false);
@@ -40,7 +39,7 @@ const Header = () => {
         <img src={LogoBlack} alt="Logo Sinergia" className="h-16 w-32" />
       </div>
       {posts?.length ? (
-        <ul className="w-full py-4 flex flex-row items-center justify-around">
+        <ul className="w-full h-12 flex flex-row items-center justify-around">
           {posts?.map((EnterpriseData) => (
             <>
               <li className="font-poppins text-xs text-center">

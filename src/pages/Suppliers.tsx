@@ -22,7 +22,9 @@ import SecundaryButton from "../components/SecundaryButton";
 const Suppliers = () => {
   const [userState, setUserState] = useState<"view" | "add" | "edit">("view");
 
-  const [supplierToEditCpf, setSupplierToEditCpf] = useState<string | null>(null);
+  const [supplierToEditCpf, setSupplierToEditCpf] = useState<string | null>(
+    null
+  );
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState<"" | "nome/" | "email/">("");
@@ -276,7 +278,9 @@ const Suppliers = () => {
                       </div>
                       <div className="flex flex-row gap-1">
                         <EditButton
-                          onClick={() => fetchClientByCpf(SupplierData.cpfOuCnpj)}
+                          onClick={() =>
+                            fetchClientByCpf(SupplierData.cpfOuCnpj)
+                          }
                         />
                       </div>
                     </li>

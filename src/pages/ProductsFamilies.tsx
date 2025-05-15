@@ -25,10 +25,12 @@ const ProductsFamilies = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [posts, setPosts] = useState<ProductFamilyData[]>([]);
 
-  const [productFamilyData, setProductFamilyData] = useState<ProductFamilyData>({
-    codigo: 0,
-    nome: "",
-  });
+  const [productFamilyData, setProductFamilyData] = useState<ProductFamilyData>(
+    {
+      codigo: 0,
+      nome: "",
+    }
+  );
 
   const fetchAllPosts = async () => {
     setIsLoading(true);
@@ -231,7 +233,9 @@ const ProductsFamilies = () => {
                       </div>
                       <div className="flex flex-row gap-1">
                         <EditButton
-                          onClick={() => fetchPostById(ProductFamilyData.codigo)}
+                          onClick={() =>
+                            fetchPostById(ProductFamilyData.codigo)
+                          }
                         />
                       </div>
                     </li>
@@ -261,17 +265,17 @@ const ProductsFamilies = () => {
                 </div>
               </div>
               <div className="h-full max-h-156 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
-                  <InputText
-                    label="Nome do Família"
-                    placeholder="Digite o Nome do Família..."
-                    value={productFamilyData.nome}
-                    onChange={(e) =>
-                      setProductFamilyData({
-                        ...productFamilyData,
-                        nome: e.target.value,
-                      })
-                    }
-                  />
+                <InputText
+                  label="Nome do Família"
+                  placeholder="Digite o Nome do Família..."
+                  value={productFamilyData.nome}
+                  onChange={(e) =>
+                    setProductFamilyData({
+                      ...productFamilyData,
+                      nome: e.target.value,
+                    })
+                  }
+                />
               </div>
               <div className="w-full flex flex-row justify-between items-center p-4 border-t border-gray">
                 <Button onClick={handleAddPost}>
@@ -312,17 +316,17 @@ const ProductsFamilies = () => {
                 </div>
               </div>
               <div className="h-full max-h-156 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
-                  <InputText
-                    label="Nome do Família"
-                    placeholder="Digite o Nome do Família..."
-                    value={productFamilyData.nome}
-                    onChange={(e) =>
-                      setProductFamilyData({
-                        ...productFamilyData,
-                        nome: e.target.value,
-                      })
-                    }
-                  />
+                <InputText
+                  label="Nome do Família"
+                  placeholder="Digite o Nome do Família..."
+                  value={productFamilyData.nome}
+                  onChange={(e) =>
+                    setProductFamilyData({
+                      ...productFamilyData,
+                      nome: e.target.value,
+                    })
+                  }
+                />
               </div>
               <div className="w-full flex flex-row gap-4 justify-between items-center p-4 border-t border-gray">
                 <SecundaryButton onClick={handleDeletePost}>
