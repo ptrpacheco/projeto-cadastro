@@ -62,3 +62,30 @@ export const ProductsFamiliesHeader = [
     width: "w-44",
   },
 ];
+
+export const ProductsHeader = [
+  {
+    title: "CÓDIGO",
+    width: "w-24",
+  },
+  {
+    title: "PRODUTO",
+    width: "w-44",
+  },
+  {
+    title: "FAMÍLIA",
+    width: "w-38",
+  },
+  {
+    title: "DESCRIÇÃO",
+    width: "w-80",
+  },
+  {
+    title: "PREÇO",
+    width: "w-24",
+  },
+  {
+    title: "FORNECEDOR",
+    width: "w-44",
+  },
+]
