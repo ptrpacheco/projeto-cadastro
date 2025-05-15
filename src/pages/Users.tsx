@@ -1,154 +1,149 @@
 import Header from "../components/Header";
 import NavBar from "../components/SideBar";
-import DeleteButton from "../components/DeleteButton";
-import EditButton from "../components/EditButton";
-import { ClientsHeader } from "../constants/CrudViewHeader";
-import { Link } from "react-router-dom";
 import { axiosPrivate } from "../api/axiosConfig";
-import type { ClientData } from "../interface/ClientData";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import CrudContainer from "../components/CrudContainer";
+import InputText from "../components/InputText";
+import Button from "../components/Button";
+import SecundaryButton from "../components/SecundaryButton";
+import InputPassword from "../components/InputPassword";
+import type { UserData } from "../interface/UserData";
 
 const Users = () => {
-  const [clients, setClients] = useState<ClientData[]>([]);
+  const [userData, setUserData] = useState<UserData>({
+    nomeUsuario: "",
+    email: "",
+    senha: "",
+  });
 
-  useEffect(() => {
-    let isMounted = true;
-    const controller = new AbortController();
+  const handleAddPost = async () => {
+    try {
+      const response = await axiosPrivate.post("/auth/register", userData);
+      console.log("Usuário criado:", response.data);
+      setUserData({ nomeUsuario: "", email: "", senha: "" }); // limpa o form
+    } catch (error) {
+      console.error("Erro ao adicionar usuário:", error);
+    }
+  };
 
-    const getClients = async () => {
-      try {
-        const response = await axiosPrivate.get("/cliente", {
-          signal: controller.signal,
-        });
-        console.log(response.data);
-        isMounted && setClients(response.data.data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
+  const handleDeletePost = async () => {
+    if (!userData.email) {
+      console.warn("Email não fornecido.");
+      return;
+    }
 
-    getClients();
-
-    return () => {
-      isMounted = false;
-      controller.abort();
-    };
-  }, []);
+    try {
+      await axiosPrivate.delete(
+        `/auth/delete/${encodeURIComponent(userData.email)}`
+      );
+      console.log("Usuário deletado com sucesso");
+    } catch (error) {
+      console.error("Erro ao apagar usuário:", error);
+    }
+  };
 
   return (
     <div className="w-screen h-screen flex flex-col items-center justify-center overflow-hidden">
       <Header />
       <div className="size-full flex flex-row">
         <NavBar />
-              <div className="flex flex-row justify-between items-center p-4 border-b border-gray">
+        <CrudContainer>
+          <>
+            <div className="flex flex-row justify-between items-center p-4 border-b border-gray">
+              <div className="flex flex-row items-center gap-2">
                 <h1 className="font-poppins font-semibold text-xl text-main">
-                  Clientes
+                  Usuários
                 </h1>
-                <Link to="/clientes/add">
-                  <button className="flex flex-row items-center px-4 py-2 bg-main rounded-lg gap-2 cursor-pointer duration-200 hover:opacity-80">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="10"
-                      height="10"
-                      viewBox="0 0 10 10"
-                      fill="none"
-                    >
-                      <path
-                        d="M5 1V9M1 5H9"
-                        stroke="white"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                    </svg>
-                    <span className="font-poppins text-white font-semibold text-sm">
-                      Adicionar Novo Cliente
-                    </span>
-                  </button>
-                </Link>
-              </div>
-              <div className="flex flex-row justify-between items-center p-4 border-b border-gray">
-                <div className="flex flex-row w-2/5">
-                  <input
-                    type="text"
-                    placeholder="Pesquisar..."
-                    className="w-full px-4 py-2 border-y border-l border-gray rounded-l-lg focus:outline-0"
-                  />
-                  <button className="border border-gray px-2 rounded-r-lg cursor-pointer duration-200 hover:bg-background">
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M19 19L14.65 14.65M17 9C17 13.4183 13.4183 17 9 17C4.58172 17 1 13.4183 1 9C1 4.58172 4.58172 1 9 1C13.4183 1 17 4.58172 17 9Z"
-                        stroke="#C3C3C3"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                    </svg>
-                  </button>
-                </div>
-                <div className="flex flex-row gap-2 ">
-                  <span className="text-sm text-gray">Buscar por:</span>
-                </div>
-              </div>
-              <ul className="w-full p-4 flex flex-row bg-background border-b border-gray">
-                {ClientsHeader.map((item, index) => {
-                  return (
-                    <li
-                      key={index}
-                      className={item.width + " font-poppins text-sm uppercase"}
-                    >
-                      {item.title}
-                    </li>
-                  );
-                })}
-              </ul>
-              {clients.length ? (
-                <ul className="size-full flex flex-col overflow-y-scroll">
-                  {clients.map((ClientData) => (
-                    <li className="w-full flex flex-row items-center justify-between p-4 border-b border-gray">
-                      <div className="w-full flex flex-row">
-                        <span className="text-sm basis-44 truncate">
-                          {ClientData.nomeOuRazaoSocial}
-                        </span>
-                        <span className="text-sm basis-38 truncate">
-                          {ClientData.cpfOuCnpj}
-                        </span>
-                        <span className="text-sm basis-24 truncate">
-                          {ClientData.tipoPessoa}
-                        </span>
-                        <span className="text-sm basis-38 truncate">
-                          {ClientData.email}
-                        </span>
-                        <span className="text-sm basis-38 truncate">
-                          {ClientData.telefones?.[0]
-                            ? `(${ClientData.telefones[0].ddd}) ${ClientData.telefones[0].numero}`
-                            : "N/A"}
-                        </span>
-                        <span className="text-sm basis-44 truncate">
-                          {ClientData.endereco?.enderecoFormatado ??
-                            "Endereço não disponível"}
-                        </span>
-                      </div>
-                      <div className="flex flex-row gap-1">
-                        <EditButton />
-                        <DeleteButton />
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="w-full text-center font-poppins text-sm text-gray">
-                  Nenhum usuário encontrado.
+                <p className="font-poppins text-sm text-gray">
+                  • Adicionar/Apagar Instância
                 </p>
-              )}
+              </div>
             </div>
-          </div>
+            <div className="h-full max-h-156 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
+              <InputText
+                label="Nome do Usuário"
+                placeholder="Digite o Nome do Usuário..."
+                value={userData.nomeUsuario}
+                onChange={(e) =>
+                  setUserData({
+                    ...userData,
+                    nomeUsuario: e.target.value,
+                  })
+                }
+              />
+              <div className="w-full flex flex-row gap-6">
+                <InputText
+                  label="Email"
+                  placeholder="Digite o Email do Usuário..."
+                  value={userData.email}
+                  onChange={(e) =>
+                    setUserData({
+                      ...userData,
+                      email: e.target.value,
+                    })
+                  }
+                />
+                <InputPassword
+                  label="Senha"
+                  placeholder="Digite a Senha do Usuário..."
+                  value={userData.senha}
+                  onChange={(e) =>
+                    setUserData({
+                      ...userData,
+                      senha: e.target.value,
+                    })
+                  }
+                />
+              </div>
+            </div>
+            <div className="w-full flex flex-row gap-4 justify-between items-center p-4 border-t border-gray">
+              <SecundaryButton onClick={handleDeletePost}>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 14 14"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M1.25 3.4H2.47222M2.47222 3.4H12.25M2.47222 3.4V11.8C2.47222 12.1183 2.60099 12.4235 2.8302 12.6485C3.05941 12.8736 3.37029 13 3.69444 13H9.80556C10.1297 13 10.4406 12.8736 10.6698 12.6485C10.899 12.4235 11.0278 12.1183 11.0278 11.8V3.4M4.30556 3.4V2.2C4.30556 1.88174 4.43433 1.57652 4.66354 1.35147C4.89275 1.12643 5.20362 1 5.52778 1H7.97222C8.29638 1 8.60725 1.12643 8.83646 1.35147C9.06567 1.57652 9.19444 1.88174 9.19444 2.2V3.4M5.52778 6.4V10M7.97222 6.4V10"
+                    stroke="#99CC33"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+
+                <span className="font-poppins text-main font-semibold text-sm">
+                  Apagar Instância
+                </span>
+              </SecundaryButton>
+              <Button onClick={handleAddPost}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="10"
+                  height="10"
+                  viewBox="0 0 10 10"
+                  fill="none"
+                >
+                  <path
+                    d="M5 1V9M1 5H9"
+                    stroke="white"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+
+                <span className="font-poppins text-white font-semibold text-sm">
+                  Adicionar Novo Usuário
+                </span>
+              </Button>
+            </div>
+          </>
+        </CrudContainer>
+      </div>
+    </div>
   );
 };
 
