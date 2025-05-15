@@ -22,7 +22,7 @@ import SecundaryButton from "../components/SecundaryButton";
 const Clients = () => {
   const [userState, setUserState] = useState<"view" | "add" | "edit">("view");
 
-  const [clientToEditCpf, setClientToEditCpf] = useState<string | null>(null);
+  const [postToEditId, setPostToEditId] = useState<string | null>(null);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState<"" | "nome/" | "email/">("");
@@ -70,7 +70,7 @@ const Clients = () => {
     try {
       const response = await axiosPrivate.get(`/cliente/${cpfOuCnpj}`);
       setClientData(response.data.data);
-      setClientToEditCpf(cpfOuCnpj);
+      setPostToEditId(cpfOuCnpj);
       setUserState("edit");
     } catch (error) {
       console.error("Erro ao buscar cliente:", error);
@@ -112,11 +112,11 @@ const Clients = () => {
   };
 
   const handleUpdatePost = async () => {
-    if (!clientToEditCpf) return;
+    if (!postToEditId) return;
 
     try {
       console.log("Dados sendo enviados no PUT:", clientData);
-      await axiosPrivate.put(`/cliente/${clientToEditCpf}`, clientData);
+      await axiosPrivate.put(`/cliente/${postToEditId}`, clientData);
       setUserState("view");
     } catch (error) {
       console.error("Erro ao atualizar cliente:", error);
@@ -124,10 +124,10 @@ const Clients = () => {
   };
 
   const handleDeletePost = async () => {
-    if (!clientToEditCpf) return;
+    if (!postToEditId) return;
 
     try {
-      await axiosPrivate.delete(`/cliente/${clientToEditCpf}`);
+      await axiosPrivate.delete(`/cliente/${postToEditId}`);
       setUserState("view");
     } catch (error) {
       console.error("Erro ao apagar cliente:", error);
