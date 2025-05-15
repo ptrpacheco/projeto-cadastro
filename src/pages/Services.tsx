@@ -18,6 +18,7 @@ import InputProduct from "../components/InputProduct";
 import InputNumber from "../components/InputNumber";
 import InputSelect from "../components/InputSelect";
 import { TipoDesconto } from "../constants/TipoDesconto";
+import PDFButton from "../components/PDFButton";
 
 const Clients = () => {
   const [userState, setUserState] = useState<"view" | "add" | "edit">("view");
@@ -132,6 +133,30 @@ const Clients = () => {
     }
   };
 
+  const downloadPDF = async (codigoServico: number) => {
+  try {
+    const response = await axiosPrivate.get(`/servico-pdf/${codigoServico}`, {
+      responseType: "blob", // Importante para receber o arquivo binário
+    });
+
+    // Cria URL temporária para o blob do PDF
+    const fileURL = window.URL.createObjectURL(new Blob([response.data], { type: "application/pdf" }));
+    
+    // Cria um link invisível para forçar download
+    const fileLink = document.createElement("a");
+    fileLink.href = fileURL;
+    fileLink.setAttribute("download", `servico-${codigoServico}.pdf`);
+    document.body.appendChild(fileLink);
+    fileLink.click();
+
+    // Remove o link após download
+    fileLink.remove();
+  } catch (error) {
+    console.error("Erro ao gerar PDF:", error);
+  }
+};
+
+
   const handleSearch = async () => {
     if (!searchTerm) return;
 
@@ -211,6 +236,37 @@ const Clients = () => {
       controller.abort();
     };
   }, []);
+
+  useEffect(() => {
+    const totalProdutos = serviceData.itens.reduce(
+      (total, item) => total + item.precoTotalItem,
+      0
+    );
+
+    const precoTotal = totalProdutos + serviceData.maoDeObra.preco;
+
+    setServiceData((prev) => ({
+      ...prev,
+      precoTotalProdutos: totalProdutos,
+      precoTotal: precoTotal,
+    }));
+  }, [serviceData.itens, serviceData.maoDeObra.preco]);
+
+  useEffect(() => {
+    const { tipo, valor } = serviceData.desconto;
+    let precoComDesconto = serviceData.precoTotal;
+
+    if (tipo === "porcentagem") {
+      precoComDesconto = serviceData.precoTotal * (1 - valor / 100);
+    } else if (tipo === "fixo") {
+      precoComDesconto = serviceData.precoTotal - valor;
+    }
+
+    setServiceData((prev) => ({
+      ...prev,
+      precoTotalComDesconto: precoComDesconto,
+    }));
+  }, [serviceData.desconto, serviceData.precoTotal]);
 
   return (
     <div className="w-screen h-screen flex flex-col items-center justify-center overflow-hidden">
@@ -320,6 +376,7 @@ const Clients = () => {
                         </span>
                       </div>
                       <div className="flex flex-row gap-1">
+                        <PDFButton onClick={() => downloadPDF(ServiceData.codigo)} />
                         <EditButton
                           onClick={() => fetchPostById(ServiceData.codigo)}
                         />
@@ -366,34 +423,34 @@ const Clients = () => {
                   }
                 />
                 <div className="w-full flex flex-row gap-4 items-center">
-                  <span className="font-poppins text-gray">Produtos</span>
+                  <span className="font-poppins text-gray">Mão de Obra</span>
                   <Line />
                 </div>
                 <div className="w-full flex flex-row gap-6">
                   <InputText
-                    label="Cliente (CPF/CNPJ)"
-                    placeholder="Digite o CPF/CNPJ do Cliente..."
-                    value={serviceData.cliente.cpfOuCnpj}
+                    label="Descrição"
+                    placeholder="Descreva o Serviço..."
+                    value={serviceData.maoDeObra.descricao}
                     onChange={(e) =>
                       setServiceData({
                         ...serviceData,
-                        cliente: {
-                          ...serviceData.cliente,
-                          cpfOuCnpj: e.target.value,
+                        maoDeObra: {
+                          ...serviceData.maoDeObra,
+                          descricao: e.target.value,
                         },
                       })
                     }
                   />
-                  <InputText
-                    label="Cliente (CPF/CNPJ)"
-                    placeholder="Digite o CPF/CNPJ do Cliente..."
-                    value={serviceData.cliente.cpfOuCnpj}
+                  <InputNumber
+                    label="Preço"
+                    placeholder="Digite o Preço do Serviço..."
+                    value={serviceData.maoDeObra.preco}
                     onChange={(e) =>
                       setServiceData({
                         ...serviceData,
-                        cliente: {
-                          ...serviceData.cliente,
-                          cpfOuCnpj: e.target.value,
+                        maoDeObra: {
+                          ...serviceData.maoDeObra,
+                          preco: parseFloat(e.target.value),
                         },
                       })
                     }
@@ -404,8 +461,8 @@ const Clients = () => {
                   <Line />
                 </div>
                 <InputProduct
-                  label="Produto (Código)"
-                  placeholder="Digite o Código do Produto..."
+                  label="Telefones"
+                  placeholder="Digite o telefone..."
                   value={serviceData.itens}
                   onChange={(newItens) =>
                     setServiceData({ ...serviceData, itens: newItens })
@@ -418,14 +475,8 @@ const Clients = () => {
                 <div className="w-full flex flex-row gap-6">
                   <InputNumber
                     label="Valor dos Produtos"
-                    placeholder="Digite o Valor Total dos Produtos..."
                     value={serviceData.precoTotalProdutos}
-                    onChange={(e) =>
-                      setServiceData({
-                        ...serviceData,
-                        precoTotalProdutos: e.target.value,
-                      })
-                    }
+                    readOnly={true}
                   />
                   <InputNumber
                     label="Valor Total do Serviço"
@@ -434,7 +485,7 @@ const Clients = () => {
                     onChange={(e) =>
                       setServiceData({
                         ...serviceData,
-                        precoTotal: e.target.value,
+                        precoTotal: parseFloat(e.target.value),
                       })
                     }
                   />
@@ -469,7 +520,7 @@ const Clients = () => {
                         ...serviceData,
                         desconto: {
                           ...serviceData.desconto,
-                          valor: e.target.value,
+                          valor: parseFloat(e.target.value),
                         },
                       })
                     }
@@ -477,14 +528,8 @@ const Clients = () => {
                 </div>
                 <InputNumber
                   label="Valor Total com Desconto"
-                  placeholder="Digite o Valor Total com Desconto do Serviço..."
                   value={serviceData.precoTotalComDesconto}
-                  onChange={(e) =>
-                    setServiceData({
-                      ...serviceData,
-                      precoTotalComDesconto: e.target.value,
-                    })
-                  }
+                  readOnly={true}
                 />
               </div>
               <div className="w-full flex flex-row justify-between items-center p-4 border-t border-gray">
@@ -541,34 +586,34 @@ const Clients = () => {
                   }
                 />
                 <div className="w-full flex flex-row gap-4 items-center">
-                  <span className="font-poppins text-gray">Produtos</span>
+                  <span className="font-poppins text-gray">Mão de Obra</span>
                   <Line />
                 </div>
                 <div className="w-full flex flex-row gap-6">
                   <InputText
-                    label="Cliente (CPF/CNPJ)"
-                    placeholder="Digite o CPF/CNPJ do Cliente..."
-                    value={serviceData.cliente.cpfOuCnpj}
+                    label="Descrição"
+                    placeholder="Descreva o Serviço..."
+                    value={serviceData.maoDeObra.descricao}
                     onChange={(e) =>
                       setServiceData({
                         ...serviceData,
-                        cliente: {
-                          ...serviceData.cliente,
-                          cpfOuCnpj: e.target.value,
+                        maoDeObra: {
+                          ...serviceData.maoDeObra,
+                          descricao: e.target.value,
                         },
                       })
                     }
                   />
-                  <InputText
-                    label="Cliente (CPF/CNPJ)"
-                    placeholder="Digite o CPF/CNPJ do Cliente..."
-                    value={serviceData.cliente.cpfOuCnpj}
+                  <InputNumber
+                    label="Preço"
+                    placeholder="Digite o Preço do Serviço..."
+                    value={serviceData.maoDeObra.preco}
                     onChange={(e) =>
                       setServiceData({
                         ...serviceData,
-                        cliente: {
-                          ...serviceData.cliente,
-                          cpfOuCnpj: e.target.value,
+                        maoDeObra: {
+                          ...serviceData.maoDeObra,
+                          preco: parseFloat(e.target.value),
                         },
                       })
                     }
@@ -579,8 +624,8 @@ const Clients = () => {
                   <Line />
                 </div>
                 <InputProduct
-                  label="Produto (Código)"
-                  placeholder="Digite o Código do Produto..."
+                  label="Telefones"
+                  placeholder="Digite o telefone..."
                   value={serviceData.itens}
                   onChange={(newItens) =>
                     setServiceData({ ...serviceData, itens: newItens })
@@ -593,14 +638,8 @@ const Clients = () => {
                 <div className="w-full flex flex-row gap-6">
                   <InputNumber
                     label="Valor dos Produtos"
-                    placeholder="Digite o Valor Total dos Produtos..."
                     value={serviceData.precoTotalProdutos}
-                    onChange={(e) =>
-                      setServiceData({
-                        ...serviceData,
-                        precoTotalProdutos: e.target.value,
-                      })
-                    }
+                    readOnly={true}
                   />
                   <InputNumber
                     label="Valor Total do Serviço"
@@ -609,7 +648,7 @@ const Clients = () => {
                     onChange={(e) =>
                       setServiceData({
                         ...serviceData,
-                        precoTotal: e.target.value,
+                        precoTotal: parseFloat(e.target.value),
                       })
                     }
                   />
@@ -644,23 +683,12 @@ const Clients = () => {
                         ...serviceData,
                         desconto: {
                           ...serviceData.desconto,
-                          valor: e.target.value,
+                          valor: parseFloat(e.target.value),
                         },
                       })
                     }
                   />
                 </div>
-                <InputNumber
-                  label="Valor Total com Desconto"
-                  placeholder="Digite o Valor Total com Desconto do Serviço..."
-                  value={serviceData.precoTotalComDesconto}
-                  onChange={(e) =>
-                    setServiceData({
-                      ...serviceData,
-                      precoTotalComDesconto: e.target.value,
-                    })
-                  }
-                />
               </div>
               <div className="w-full flex flex-row gap-4 justify-between items-center p-4 border-t border-gray">
                 <SecundaryButton onClick={handleDeletePost}>
@@ -700,7 +728,6 @@ const Clients = () => {
                       stroke-linejoin="round"
                     />
                   </svg>
-
                   <span className="font-poppins text-white font-semibold text-sm">
                     Salvar Alterações
                   </span>

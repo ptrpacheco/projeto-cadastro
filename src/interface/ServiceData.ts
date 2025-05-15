@@ -22,7 +22,7 @@ export interface ServiceData {
    codigo: number,
    cliente: ClientData,
    maoDeObra: maoDeObra,
-   itens: itens,
+   itens: itens[],
    precoTotalProdutos: number,
    precoTotal: number,
    desconto: desconto
