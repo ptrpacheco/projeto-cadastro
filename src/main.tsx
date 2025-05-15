@@ -7,7 +7,6 @@ import EmailValidation from "./pages/EmailValidation";
 import Enterprise from "./pages/Enterprise";
 import ProductsFamilies from "./pages/ProductsFamilies";
 import Suppliers from "./pages/Suppliers";
-import Login from "./pages/Login";
 import NotFoundPage from "./pages/NotFoundPage";
 import Products from "./pages/Products";
 import Services from "./pages/Services";
@@ -17,7 +16,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const router = createBrowserRouter([
   { path: "/", element: <App /> },
-  { path: "/login", element: <Login /> },
   { path: "/confirmar/:token", element: <EmailValidation /> },
   { path: "/clientes", element: <Clients /> },
   { path: "/fornecedores", element: <Suppliers /> },

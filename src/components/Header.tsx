@@ -4,26 +4,30 @@ import { axiosPrivate } from "../api/axiosConfig";
 import type { EnterpriseData } from "../interface/EnterpriseData";
 
 const Header = () => {
-  const [enterprise, setEnterprise] = useState<EnterpriseData[]>([]);
+  const [posts, setPosts] = useState<EnterpriseData[]>([]);
+    const [error, setError] = useState();
+    const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
     const controller = new AbortController();
 
-    const getEnterprise = async () => {
+    const fetchPosts = async () => {
+      setIsLoading(true);
       try {
         const response = await axiosPrivate.get("/empresa", {
           signal: controller.signal,
         });
         console.log(response.data);
-        isMounted && setEnterprise(response.data.data);
-      } catch (err) {
-        console.error(err);
+        isMounted && setPosts(response.data.data);
+      } catch (e: any) {
+        setError(e);
       }
+
+      setIsLoading(false);
     };
 
-    getEnterprise();
-
+    fetchPosts();
     return () => {
       isMounted = false;
       controller.abort();
@@ -35,9 +39,9 @@ const Header = () => {
       <div className="w-full py-4 flex flex-row items-center justify-center shadow-lg">
         <img src={LogoBlack} alt="Logo Sinergia" className="h-16 w-32" />
       </div>
-      {enterprise?.length ? (
+      {posts?.length ? (
         <ul className="w-full py-4 flex flex-row items-center justify-around">
-          {enterprise?.map((EnterpriseData) => (
+          {posts?.map((EnterpriseData) => (
             <>
               <li className="font-poppins text-xs text-center">
                 {EnterpriseData.nomeFantasia}

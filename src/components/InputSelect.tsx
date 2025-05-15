@@ -1,25 +1,24 @@
-import React from "react";
+import React, { type ReactNode } from "react";
 
-interface InputTextProps {
+interface InputSelectProps {
   label?: string;
-  placeholder?: string;
   value?: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  children: ReactNode;
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }
-
-const InputText = ({ label, placeholder, value, onChange }: InputTextProps) => {
+const InputSelect = ({ label, value, children, onChange }: InputSelectProps) => {
   return (
     <div className="w-full flex flex-col gap-1">
       <label className="font-poppins font-light text-sm">{label}</label>
-      <input
-        type="text"
-        placeholder={placeholder}
+      <select
         onChange={onChange}
         value={value}
         className="w-full h-10 p-2 border border-gray rounded-lg placeholder:font-poppins placeholder:font-light placeholder:text-xs placeholder:text-gray focus:outline-0 focus:border-main duration-300"
-      />
+      >
+        {children}
+      </select>
     </div>
   );
 };
 
-export default InputText;
+export default InputSelect;
