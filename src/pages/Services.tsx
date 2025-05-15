@@ -20,7 +20,7 @@ import InputSelect from "../components/InputSelect";
 import { TipoDesconto } from "../constants/TipoDesconto";
 import PDFButton from "../components/PDFButton";
 
-const Clients = () => {
+const Services = () => {
   const [userState, setUserState] = useState<"view" | "add" | "edit">("view");
 
   const [postToEditId, setPostToEditId] = useState<number | null>(null);
@@ -62,39 +62,7 @@ const Clients = () => {
     },
     itens: [
       {
-        produto: {
-          codigo: 0,
-          familia: {
-            codigo: 0,
-            nome: "",
-          },
-          nome: "",
-          descricao: "",
-          preco: 0,
-          fornecedor: {
-            cpfOuCnpj: "",
-            tipoPessoa: "",
-            nomeOuRazaoSocial: "",
-            email: "",
-            endereco: {
-              cep: "",
-              logradouro: "",
-              numero: "",
-              complemento: "",
-              bairro: "",
-              cidade: "",
-              uf: "",
-              enderecoFormatado: "",
-            },
-            telefones: [
-              {
-                tipo: "",
-                ddd: 0,
-                numero: 0,
-              },
-            ],
-          },
-        },
+        produtoId: 0,
         quantidade: 0,
         precoUnitario: 0,
         precoTotalItem: 0,
@@ -116,7 +84,7 @@ const Clients = () => {
       const response = await axiosPrivate.get("/servico");
       setPosts(response.data.data);
     } catch (error) {
-      console.error("Erro ao buscar todos os servicços:", error);
+      console.error("Erro ao buscar todos os serviços:", error);
     } finally {
       setIsLoading(false);
     }
@@ -136,26 +104,22 @@ const Clients = () => {
   const downloadPDF = async (codigoServico: number) => {
   try {
     const response = await axiosPrivate.get(`/servico-pdf/${codigoServico}`, {
-      responseType: "blob", // Importante para receber o arquivo binário
+      responseType: "blob",
     });
 
-    // Cria URL temporária para o blob do PDF
     const fileURL = window.URL.createObjectURL(new Blob([response.data], { type: "application/pdf" }));
     
-    // Cria um link invisível para forçar download
     const fileLink = document.createElement("a");
     fileLink.href = fileURL;
     fileLink.setAttribute("download", `servico-${codigoServico}.pdf`);
     document.body.appendChild(fileLink);
     fileLink.click();
 
-    // Remove o link após download
     fileLink.remove();
   } catch (error) {
     console.error("Erro ao gerar PDF:", error);
   }
 };
-
 
   const handleSearch = async () => {
     if (!searchTerm) return;
@@ -181,26 +145,34 @@ const Clients = () => {
     }
   };
 
-  const handleAddPost = async () => {
-    try {
-      const response = await axiosPrivate.post("/servico", serviceData);
-      console.log("Serviço criado:", response.data);
-      setUserState("view");
-    } catch (error) {
-      console.error("Erro ao adicionar serviço:", error);
-    }
-  };
+const handleAddPost = async () => {
+  try {
+    const payload = {
+      ...serviceData,
+      cliente: serviceData.cliente.cpfOuCnpj
+    };
+    const response = await axiosPrivate.post("/servico", payload);
+    console.log("Serviço criado:", response.data);
+    setUserState("view");
+  } catch (error) {
+    console.error("Erro ao adicionar serviço:", error);
+  }
+};
 
-  const handleUpdatePost = async () => {
-    if (!postToEditId) return;
+const handleUpdatePost = async () => {
+  if (!postToEditId) return;
 
-    try {
-      await axiosPrivate.put(`/servico/${postToEditId}`, serviceData);
-      setUserState("view");
-    } catch (error) {
-      console.error("Erro ao atualizar serviço:", error);
-    }
-  };
+  try {
+    const payload = {
+      ...serviceData,
+      cliente: serviceData.cliente.cpfOuCnpj
+    };
+    await axiosPrivate.put(`/servico/${postToEditId}`, payload);
+    setUserState("view");
+  } catch (error) {
+    console.error("Erro ao atualizar serviço:", error);
+  }
+};
 
   const handleDeletePost = async () => {
     if (!postToEditId) return;
@@ -212,6 +184,29 @@ const Clients = () => {
       console.error("Erro ao apagar serviço:", error);
     }
   };
+
+  useEffect(() => {
+  const precoTotalProdutos = serviceData.itens.reduce((total, item) => {
+    return total + (item.precoTotalItem || 0);
+  }, 0);
+
+  const precoTotal = precoTotalProdutos + (serviceData.maoDeObra?.preco || 0);
+
+  const descontoValor = serviceData.desconto?.valor || 0;
+  const precoTotalComDesconto =
+    serviceData.desconto?.tipo === "VALOR"
+      ? precoTotal - descontoValor
+      : serviceData.desconto?.tipo === "PORCENTAGEM"
+      ? precoTotal - precoTotal * (descontoValor / 100)
+      : precoTotal;
+
+  setServiceData((prev) => ({
+    ...prev,
+    precoTotalProdutos,
+    precoTotal,
+    precoTotalComDesconto,
+  }));
+}, [serviceData.itens, serviceData.maoDeObra.preco, serviceData.desconto]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -236,37 +231,6 @@ const Clients = () => {
       controller.abort();
     };
   }, []);
-
-  useEffect(() => {
-    const totalProdutos = serviceData.itens.reduce(
-      (total, item) => total + item.precoTotalItem,
-      0
-    );
-
-    const precoTotal = totalProdutos + serviceData.maoDeObra.preco;
-
-    setServiceData((prev) => ({
-      ...prev,
-      precoTotalProdutos: totalProdutos,
-      precoTotal: precoTotal,
-    }));
-  }, [serviceData.itens, serviceData.maoDeObra.preco]);
-
-  useEffect(() => {
-    const { tipo, valor } = serviceData.desconto;
-    let precoComDesconto = serviceData.precoTotal;
-
-    if (tipo === "porcentagem") {
-      precoComDesconto = serviceData.precoTotal * (1 - valor / 100);
-    } else if (tipo === "fixo") {
-      precoComDesconto = serviceData.precoTotal - valor;
-    }
-
-    setServiceData((prev) => ({
-      ...prev,
-      precoTotalComDesconto: precoComDesconto,
-    }));
-  }, [serviceData.desconto, serviceData.precoTotal]);
 
   return (
     <div className="w-screen h-screen flex flex-col items-center justify-center overflow-hidden">
@@ -453,6 +417,7 @@ const Clients = () => {
                           preco: parseFloat(e.target.value),
                         },
                       })
+        
                     }
                   />
                 </div>
@@ -461,8 +426,8 @@ const Clients = () => {
                   <Line />
                 </div>
                 <InputProduct
-                  label="Telefones"
-                  placeholder="Digite o telefone..."
+                  label="Produtos"
+                  placeholder="Digite o Código do Produto..."
                   value={serviceData.itens}
                   onChange={(newItens) =>
                     setServiceData({ ...serviceData, itens: newItens })
@@ -482,12 +447,7 @@ const Clients = () => {
                     label="Valor Total do Serviço"
                     placeholder="Digite o Valor Total do Serviço..."
                     value={serviceData.precoTotal}
-                    onChange={(e) =>
-                      setServiceData({
-                        ...serviceData,
-                        precoTotal: parseFloat(e.target.value),
-                      })
-                    }
+                    readOnly={true}
                   />
                 </div>
                 <div className="w-full flex flex-row gap-6">
@@ -624,8 +584,8 @@ const Clients = () => {
                   <Line />
                 </div>
                 <InputProduct
-                  label="Telefones"
-                  placeholder="Digite o telefone..."
+                  label="Produtos"
+                  placeholder="Digite o Código do Produto..."
                   value={serviceData.itens}
                   onChange={(newItens) =>
                     setServiceData({ ...serviceData, itens: newItens })
@@ -645,12 +605,7 @@ const Clients = () => {
                     label="Valor Total do Serviço"
                     placeholder="Digite o Valor Total do Serviço..."
                     value={serviceData.precoTotal}
-                    onChange={(e) =>
-                      setServiceData({
-                        ...serviceData,
-                        precoTotal: parseFloat(e.target.value),
-                      })
-                    }
+                    readOnly={true}
                   />
                 </div>
                 <div className="w-full flex flex-row gap-6">
@@ -689,6 +644,11 @@ const Clients = () => {
                     }
                   />
                 </div>
+                <InputNumber
+                  label="Valor Total com Desconto"
+                  value={serviceData.precoTotalComDesconto}
+                  readOnly={true}
+                />
               </div>
               <div className="w-full flex flex-row gap-4 justify-between items-center p-4 border-t border-gray">
                 <SecundaryButton onClick={handleDeletePost}>
@@ -741,4 +701,4 @@ const Clients = () => {
   );
 };
 
-export default Clients;
+export default Services;

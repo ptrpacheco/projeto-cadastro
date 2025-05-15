@@ -1,5 +1,4 @@
 import type { ClientData } from "./ClientData";
-import type { ProductData } from "./ProductData";
 
 export interface maoDeObra {
    descricao: string,
@@ -7,7 +6,7 @@ export interface maoDeObra {
 }
 
 export interface itens {
-   produto: ProductData,
+   produtoId: number,
    quantidade: number,
    precoUnitario: number,
    precoTotalItem: number,

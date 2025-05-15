@@ -8,19 +8,22 @@ import Button from "../components/Button";
 import SecundaryButton from "../components/SecundaryButton";
 import InputPassword from "../components/InputPassword";
 import type { UserData } from "../interface/UserData";
+import InputSelect from "../components/InputSelect";
+import { CategoriaUsuario } from "../constants/CategoriaUsuario";
 
 const Users = () => {
   const [userData, setUserData] = useState<UserData>({
     nomeUsuario: "",
     email: "",
     senha: "",
+    categoria: "",
   });
 
   const handleAddPost = async () => {
     try {
       const response = await axiosPrivate.post("/auth/register", userData);
       console.log("Usuário criado:", response.data);
-      setUserData({ nomeUsuario: "", email: "", senha: "" }); // limpa o form
+      setUserData({ nomeUsuario: "", email: "", senha: "", categoria: "" });
     } catch (error) {
       console.error("Erro ao adicionar usuário:", error);
     }
@@ -60,7 +63,8 @@ const Users = () => {
               </div>
             </div>
             <div className="h-full max-h-156 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
-              <InputText
+              <div className="w-full flex flex-row gap-6">
+                <InputText
                 label="Nome do Usuário"
                 placeholder="Digite o Nome do Usuário..."
                 value={userData.nomeUsuario}
@@ -71,6 +75,24 @@ const Users = () => {
                   })
                 }
               />
+              <InputSelect
+                    label="Categoria"
+                    value={userData.categoria}
+                    onChange={(e) =>
+                      setUserData({
+                        ...userData,
+                        categoria: e.target.value
+                      })
+                    }
+                  >
+                    <option value="">Selecione</option>
+                    {CategoriaUsuario.map((CategoriaUsuario, i) => (
+                      <option key={i} value={CategoriaUsuario.value}>
+                        {CategoriaUsuario.label}
+                      </option>
+                    ))}
+                  </InputSelect>
+              </div>
               <div className="w-full flex flex-row gap-6">
                 <InputText
                   label="Email"

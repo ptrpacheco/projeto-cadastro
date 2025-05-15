@@ -1,7 +1,7 @@
-import type { ProductData } from "../interface/ProductData";
+import { axiosPrivate } from "../api/axiosConfig";
 
 interface Product {
-  produto: ProductData;
+  produtoId: number;
   quantidade: number;
   precoUnitario: number;
   precoTotalItem: number;
@@ -14,36 +14,67 @@ interface InputProductProps {
   onChange: (products: Product[]) => void;
 }
 
-const InputProduct = ({ label, placeholder, value, onChange }: InputProductProps) => {
+const InputProduct = ({
+  label,
+  placeholder,
+  value,
+  onChange,
+}: InputProductProps) => {
   const products = value;
   const setProducts = onChange;
 
-  const handleCodigoChange = (index: number, newCodigo: number) => {
-    // Aqui você pode buscar o ProductData completo pelo código, 
-    // se tiver um lookup (ex: lista de produtos em memória)
-    // Para exemplo simples, vou só atualizar o código no produto.
+  const handleCodigoChange = async (index: number, newCodigo: number) => {
+    try {
+      const response = await axiosPrivate.get(`/produto/${newCodigo}`);
+      const produto = response.data.data;
 
-    const updated = products.map((product, i) => {
-      if (i === index) {
-        return {
-          ...product,
-          produto: { ...product.produto, codigo: newCodigo }, // atualiza só o código
-        };
-      }
-      return product;
-    });
+      const updated = products.map((product, i) => {
+        if (i === index) {
+          const precoUnitario = produto.preco ?? 0;
+          const quantidade = product.quantidade;
+          return {
+            ...product,
+            produtoId: newCodigo,
+            precoUnitario,
+            precoTotalItem: precoUnitario * quantidade,
+          };
+        }
+        return product;
+      });
 
-    setProducts(updated);
+      setProducts(updated);
+    } catch (error) {
+      console.error("Erro ao buscar produto:", error);
+
+      const updated = products.map((product, i) => {
+        if (i === index) {
+          return {
+            ...product,
+            produtoId: newCodigo,
+            precoUnitario: 0,
+            precoTotalItem: 0,
+          };
+        }
+        return product;
+      });
+
+      setProducts(updated);
+    }
   };
 
-  const handleFieldChange = (index: number, field: keyof Omit<Product, 'produto' | 'precoTotalItem'>, newValue: number) => {
+  const handleFieldChange = (
+    index: number,
+    field: keyof Omit<Product, "precoTotalItem">,
+    newValue: number
+  ) => {
     const updated = products.map((product, i) => {
       if (i === index) {
         const updatedProduct = {
           ...product,
           [field]: newValue,
         };
-        updatedProduct.precoTotalItem = updatedProduct.quantidade * updatedProduct.precoUnitario;
+        updatedProduct.precoTotalItem =
+          updatedProduct.quantidade * updatedProduct.precoUnitario;
         return updatedProduct;
       }
       return product;
@@ -52,7 +83,15 @@ const InputProduct = ({ label, placeholder, value, onChange }: InputProductProps
   };
 
   const handleAdd = () => {
-    setProducts([...products, { produto: { codigo: 0 }, quantidade: 1, precoUnitario: 0, precoTotalItem: 0 }]);
+    setProducts([
+      ...products,
+      {
+        produtoId: 0,
+        quantidade: 1,
+        precoUnitario: 0,
+        precoTotalItem: 0,
+      },
+    ]);
   };
 
   const handleRemove = (index: number) => {
@@ -64,32 +103,38 @@ const InputProduct = ({ label, placeholder, value, onChange }: InputProductProps
     <div className="w-full flex flex-col gap-4">
       {products.map((product, index) => (
         <div key={index} className="flex flex-col gap-1">
-          {label && index === 0 && <label className="font-poppins font-light text-sm">{label}</label>}
+          {label && index === 0 && (
+            <label className="font-poppins font-light text-sm">{label}</label>
+          )}
           <div className="flex flex-row gap-2 items-center">
             <input
               type="number"
-              value={product.produto.codigo}
+              value={product.produtoId}
               placeholder={placeholder}
-              onChange={(e) => handleCodigoChange(index, Number(e.target.value))}
+              onChange={(e) =>
+                handleCodigoChange(index, parseInt(e.target.value) || 0)
+              }
               className="w-full h-10 p-2 border border-gray rounded-lg placeholder:font-poppins placeholder:font-light placeholder:text-xs placeholder:text-gray focus:outline-0 focus:border-main duration-300"
             />
             <input
               type="number"
               value={product.quantidade}
-              onChange={(e) => handleFieldChange(index, "quantidade", Number(e.target.value))}
+              onChange={(e) =>
+                handleFieldChange(index, "quantidade", Number(e.target.value))
+              }
               className="w-24 h-10 p-2 border border-gray rounded-lg placeholder:font-poppins placeholder:font-light placeholder:text-xs placeholder:text-gray focus:outline-0 focus:border-main duration-300"
             />
             <input
               type="number"
               value={product.precoUnitario}
-              onChange={(e) => handleFieldChange(index, "precoUnitario", Number(e.target.value))}
+              readOnly
               className="w-28 h-10 p-2 border border-gray rounded-lg placeholder:font-poppins placeholder:font-light placeholder:text-xs placeholder:text-gray focus:outline-0 focus:border-main duration-300"
             />
             <input
               type="number"
               value={product.precoTotalItem}
               readOnly
-              className="w-28 h-10 p-2 border border-gray rounded-lg text-gray placeholder:font-poppins placeholder:font-light placeholder:text-xs placeholder:text-gray"
+              className="w-28 h-10 p-2 border border-gray rounded-lg bg-gray-100 text-gray-600 placeholder:font-poppins placeholder:font-light placeholder:text-xs placeholder:text-gray"
             />
             {index === products.length - 1 ? (
               <button
@@ -107,9 +152,9 @@ const InputProduct = ({ label, placeholder, value, onChange }: InputProductProps
                   <path
                     d="M5 1V9M1 5H9"
                     stroke="#c3c3c3"
-                    stroke-width="1"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                    strokeWidth="1"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   />
                 </svg>
               </button>
@@ -129,9 +174,9 @@ const InputProduct = ({ label, placeholder, value, onChange }: InputProductProps
                   <path
                     d="M1 1H13"
                     stroke="#C3C3C3"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   />
                 </svg>
               </button>
