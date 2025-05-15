@@ -22,7 +22,7 @@ import SecundaryButton from "../components/SecundaryButton";
 const Suppliers = () => {
   const [userState, setUserState] = useState<"view" | "add" | "edit">("view");
 
-  const [supplierToEditCpf, setSupplierToEditCpf] = useState<string | null>(
+  const [postToEditId, setPostToEditId] = useState<string | null>(
     null
   );
 
@@ -68,11 +68,11 @@ const Suppliers = () => {
     }
   };
 
-  const fetchClientByCpf = async (cpfOuCnpj: string) => {
+  const fetchPostsById = async (cpfOuCnpj: string) => {
     try {
       const response = await axiosPrivate.get(`/fornecedor/${cpfOuCnpj}`);
       setSupplierData(response.data.data);
-      setSupplierToEditCpf(cpfOuCnpj);
+      setPostToEditId(cpfOuCnpj);
       setUserState("edit");
     } catch (error) {
       console.error("Erro ao buscar fornecedor:", error);
@@ -114,11 +114,11 @@ const Suppliers = () => {
   };
 
   const handleUpdatePost = async () => {
-    if (!supplierToEditCpf) return;
+    if (!postToEditId) return;
 
     try {
       console.log("Dados sendo enviados no PUT:", supplierData);
-      await axiosPrivate.put(`/fornecedor/${supplierToEditCpf}`, supplierData);
+      await axiosPrivate.put(`/fornecedor/${postToEditId}`, supplierData);
       setUserState("view");
     } catch (error) {
       console.error("Erro ao atualizar fornecedor:", error);
@@ -126,10 +126,10 @@ const Suppliers = () => {
   };
 
   const handleDeletePost = async () => {
-    if (!supplierToEditCpf) return;
+    if (!postToEditId) return;
 
     try {
-      await axiosPrivate.delete(`/fornecedor/${supplierToEditCpf}`);
+      await axiosPrivate.delete(`/fornecedor/${postToEditId}`);
       setUserState("view");
     } catch (error) {
       console.error("Erro ao apagar fornecedor:", error);
@@ -279,7 +279,7 @@ const Suppliers = () => {
                       <div className="flex flex-row gap-1">
                         <EditButton
                           onClick={() =>
-                            fetchClientByCpf(SupplierData.cpfOuCnpj)
+                            fetchPostsById(SupplierData.cpfOuCnpj)
                           }
                         />
                       </div>
