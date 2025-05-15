@@ -261,7 +261,7 @@ const Suppliers = () => {
                         <span className="text-sm basis-24 truncate">
                           {SupplierData.tipoPessoa}
                         </span>
-                        <span className="text-sm basis-38 truncate">
+                        <span className="text-sm basis-44 truncate">
                           {SupplierData.email}
                         </span>
                         <span className="text-sm basis-38 truncate">
