@@ -89,3 +89,30 @@ export const ProductsHeader = [
     width: "w-44",
   },
 ]
+
+export const ServicesHeader = [
+  {
+    title: "CÓDIGO",
+    width: "w-24"
+  },
+  {
+    title: "CLIENTE",
+    width: "w-44"
+  },
+  {
+    title: "CPF/CNPJ",
+    width: "w-38"
+  },
+  {
+    title: "DESCRIÇÃO",
+    width: "w-80"
+  },
+  {
+    title: "PREÇO",
+    width: "w-24"
+  },
+  {
+    title: "DATA CRIAÇÃO",
+    width: "w-32"
+  },
+]
