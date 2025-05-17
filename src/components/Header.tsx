@@ -39,7 +39,7 @@ const Header = () => {
         <img src={LogoBlack} alt="Logo Sinergia" className="h-16 w-32" />
       </div>
       {posts?.length ? (
-        <ul className="w-full h-12 flex flex-row items-center justify-around">
+        <ul className="w-full h-12 grow-0 flex flex-row items-center justify-around">
           {posts?.map((EnterpriseData) => (
             <>
               <li className="font-poppins text-xs text-center">
