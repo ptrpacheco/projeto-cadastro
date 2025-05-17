@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { LoginService } from "./service/LoginService";
 import { LogoBlackHorizontal } from "./assets";
 import Line from "./components/Line";
-import InputText from "./components/InputText";
-import InputPassword from "./components/InputPassword";
-import Button from "./components/Button";
+import InputText from "./components/input/InputText";
+import InputPassword from "./components/input/InputPassword";
+import Button from "./components/button/Button";
 
 function App() {
   const [email, setEmail] = useState("");
