@@ -194,32 +194,31 @@ const Clients = () => {
     }
   };
 
-useEffect(() => {
-  const controller = new AbortController();
+  useEffect(() => {
+    const controller = new AbortController();
 
-  const fetchPosts = async () => {
-    setIsLoading(true);
-    try {
-      const response = await axiosPrivate.get("/cliente", {
-        signal: controller.signal,
-      });
-      setPosts(response.data.data);
-      setRequestError(null);
-    } catch (error) {
-      if (axios.isCancel(error)) return;
-      setRequestError(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    const fetchPosts = async () => {
+      setIsLoading(true);
+      try {
+        const response = await axiosPrivate.get("/cliente", {
+          signal: controller.signal,
+        });
+        setPosts(response.data.data);
+        setRequestError(null);
+      } catch (error) {
+        if (axios.isCancel(error)) return;
+        setRequestError(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  fetchPosts();
+    fetchPosts();
 
-  return () => {
-    controller.abort();
-  };
-}, []);
-
+    return () => {
+      controller.abort();
+    };
+  }, []);
 
   return (
     <div className="w-screen h-screen flex flex-col items-center justify-center overflow-hidden">
@@ -231,15 +230,15 @@ useEffect(() => {
             <>
               <div className="flex flex-row justify-between items-center p-4 border-b border-gray">
                 <div className="flex items-center gap-2">
-                <h1 className="font-poppins font-semibold text-xl text-main">
-                  Clientes
-                </h1>
-                {requestError instanceof Error && (
-                  <RequestError
-                    error={requestError}
-                    customMessage="Erro ao carregar os clientes."
-                  />
-                )}
+                  <h1 className="font-poppins font-semibold text-xl text-main">
+                    Clientes
+                  </h1>
+                  {requestError instanceof Error && (
+                    <RequestError
+                      error={requestError}
+                      customMessage="Erro ao carregar os clientes."
+                    />
+                  )}
                 </div>
                 <AddButton
                   onClick={() => {

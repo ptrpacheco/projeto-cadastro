@@ -142,7 +142,7 @@ const Products = () => {
   const getProductFamilyName = (codigo: number) => {
     if (!codigo) return "Selecione uma família de produtos";
     const productFamily = productFamilyList.find((pf) => pf.codigo === codigo);
-    return productFamily?.nome || "Cliente não encontrado";
+    return productFamily?.nome || "Família não encontrada";
   };
 
   useEffect(() => {
@@ -168,7 +168,7 @@ const Products = () => {
 
     setProductData((prev) => ({
       ...prev,
-      cliente: {
+      fornecedor: {
         ...selectedSupplier,
         cpfOuCnpj: selectedSupplier.cpfOuCnpj,
       },
@@ -244,6 +244,7 @@ const Products = () => {
       const response = await axiosPrivate.post("/produto", payload);
       console.log("Produto criado:", response.data);
       setUserState("view");
+      fetchAllPosts();
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const apiMessage = error.response?.data?.message;
@@ -267,6 +268,7 @@ const Products = () => {
       console.log("Dados sendo enviados no PUT:", productData);
       await axiosPrivate.put(`/produto/${postToEditId}`, payload);
       setUserState("view");
+      fetchAllPosts();
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const apiMessage = error.response?.data?.message;
@@ -284,6 +286,7 @@ const Products = () => {
     try {
       await axiosPrivate.delete(`/produto/${postToEditId}`);
       setUserState("view");
+      fetchAllPosts();
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const apiMessage = error.response?.data?.message;
@@ -295,32 +298,31 @@ const Products = () => {
     }
   };
 
-useEffect(() => {
-  const controller = new AbortController();
+  useEffect(() => {
+    const controller = new AbortController();
 
-  const fetchPosts = async () => {
-    setIsLoading(true);
-    try {
-      const response = await axiosPrivate.get("/produto", {
-        signal: controller.signal,
-      });
-      setPosts(response.data.data);
-      setRequestError(null);
-    } catch (error) {
-      if (axios.isCancel(error)) return;
-      setRequestError(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    const fetchPosts = async () => {
+      setIsLoading(true);
+      try {
+        const response = await axiosPrivate.get("/produto", {
+          signal: controller.signal,
+        });
+        setPosts(response.data.data);
+        setRequestError(null);
+      } catch (error) {
+        if (axios.isCancel(error)) return;
+        setRequestError(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  fetchPosts();
+    fetchPosts();
 
-  return () => {
-    controller.abort();
-  };
-}, []);
-
+    return () => {
+      controller.abort();
+    };
+  }, []);
 
   return (
     <>
@@ -488,7 +490,11 @@ useEffect(() => {
               <>
                 <div className="flex flex-row justify-between items-center p-4 border-b border-gray">
                   <div className="flex flex-row items-center gap-2">
-                    <CancelButton onClick={() => setUserState("view")} />
+                    <CancelButton
+                      onClick={() => {
+                        setUserState("view"), setFormError("");
+                      }}
+                    />
                     <h1 className="font-poppins font-semibold text-xl text-main">
                       Produtos
                     </h1>
@@ -590,7 +596,11 @@ useEffect(() => {
               <>
                 <div className="flex flex-row justify-between items-center p-4 border-b border-gray">
                   <div className="flex flex-row items-center gap-2">
-                    <CancelButton onClick={() => setUserState("view")} />
+                    <CancelButton
+                      onClick={() => {
+                        setUserState("view"), setFormError("");
+                      }}
+                    />
                     <h1 className="font-poppins font-semibold text-xl text-main">
                       Produtos
                     </h1>

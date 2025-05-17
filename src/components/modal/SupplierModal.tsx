@@ -39,7 +39,7 @@ const SupplierModal = ({ open, onClose, onSelect }: SupplierModalProps) => {
           <div className="flex flex-row items-center gap-2">
             <CancelButton onClick={onClose} />
             <h1 className="font-poppins font-semibold text-xl text-main">
-              Selecionar Cliente
+              Selecionar Fornecedor
             </h1>
           </div>
         </div>

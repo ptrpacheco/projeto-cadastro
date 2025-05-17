@@ -139,6 +139,7 @@ const Suppliers = () => {
       const response = await axiosPrivate.post("/fornecedor", supplierData);
       console.log("Fornecedor criado:", response.data);
       setUserState("view");
+      fetchAllPosts();
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const apiMessage = error.response?.data?.message;
@@ -157,6 +158,7 @@ const Suppliers = () => {
       console.log("Dados sendo enviados no PUT:", supplierData);
       await axiosPrivate.put(`/fornecedor/${postToEditId}`, supplierData);
       setUserState("view");
+      fetchAllPosts();
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const apiMessage = error.response?.data?.message;
@@ -174,6 +176,7 @@ const Suppliers = () => {
     try {
       await axiosPrivate.delete(`/fornecedor/${postToEditId}`);
       setUserState("view");
+      fetchAllPosts();
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const apiMessage = error.response?.data?.message;
@@ -185,32 +188,31 @@ const Suppliers = () => {
     }
   };
 
-useEffect(() => {
-  const controller = new AbortController();
+  useEffect(() => {
+    const controller = new AbortController();
 
-  const fetchPosts = async () => {
-    setIsLoading(true);
-    try {
-      const response = await axiosPrivate.get("/fornecedor", {
-        signal: controller.signal,
-      });
-      setPosts(response.data.data);
-      setRequestError(null);
-    } catch (error) {
-      if (axios.isCancel(error)) return;
-      setRequestError(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    const fetchPosts = async () => {
+      setIsLoading(true);
+      try {
+        const response = await axiosPrivate.get("/fornecedor", {
+          signal: controller.signal,
+        });
+        setPosts(response.data.data);
+        setRequestError(null);
+      } catch (error) {
+        if (axios.isCancel(error)) return;
+        setRequestError(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  fetchPosts();
+    fetchPosts();
 
-  return () => {
-    controller.abort();
-  };
-}, []);
-
+    return () => {
+      controller.abort();
+    };
+  }, []);
 
   return (
     <div className="w-screen h-screen flex flex-col items-center justify-center overflow-hidden">
@@ -362,7 +364,11 @@ useEffect(() => {
             <>
               <div className="flex flex-row justify-between items-center p-4 border-b border-gray">
                 <div className="flex flex-row items-center gap-2">
-                  <CancelButton onClick={() => setUserState("view")} />
+                  <CancelButton
+                    onClick={() => {
+                      setUserState("view"), setFormError("");
+                    }}
+                  />
                   <h1 className="font-poppins font-semibold text-xl text-main">
                     Fornecedores
                   </h1>
@@ -577,7 +583,11 @@ useEffect(() => {
             <>
               <div className="flex flex-row justify-between items-center p-4 border-b border-gray">
                 <div className="flex flex-row items-center gap-2">
-                  <CancelButton onClick={() => setUserState("view")} />
+                  <CancelButton
+                    onClick={() => {
+                      setUserState("view"), setFormError("");
+                    }}
+                  />
                   <h1 className="font-poppins font-semibold text-xl text-main">
                     Fornecedores
                   </h1>
