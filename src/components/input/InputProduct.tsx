@@ -1,4 +1,6 @@
-import { axiosPrivate } from "../api/axiosConfig";
+import { axiosPrivate } from "../../api/axiosConfig";
+import ModalButton from "../button/ModalButton";
+import InputNumber from "./InputNumber";
 
 interface Product {
   produtoId: number;
@@ -8,18 +10,11 @@ interface Product {
 }
 
 interface InputProductProps {
-  label?: string;
-  placeholder?: string;
   value: Product[];
   onChange: (products: Product[]) => void;
 }
 
-const InputProduct = ({
-  label,
-  placeholder,
-  value,
-  onChange,
-}: InputProductProps) => {
+const InputProduct = ({ value, onChange }: InputProductProps) => {
   const products = value;
   const setProducts = onChange;
 
@@ -103,39 +98,54 @@ const InputProduct = ({
     <div className="w-full flex flex-col gap-4">
       {products.map((product, index) => (
         <div key={index} className="flex flex-col gap-1">
-          {label && index === 0 && (
-            <label className="font-poppins font-light text-sm">{label}</label>
-          )}
-          <div className="flex flex-row gap-2 items-center">
-            <input
+          <div className="w-full flex flex-row gap-2 items-end">
+            <div key={index} className="w-full flex flex-col gap-1">
+              {index === 0 && (
+                <label className="font-poppins font-light text-sm">
+                  Produto
+                </label>
+              )}
+              <ModalButton />
+              {/* OLD CODE:
+              <input
               type="number"
               value={product.produtoId}
-              placeholder={placeholder}
+              placeholder="Digite o Código do Produto"
               onChange={(e) =>
                 handleCodigoChange(index, parseInt(e.target.value) || 0)
               }
               className="w-full h-10 p-2 border border-gray rounded-lg placeholder:font-poppins placeholder:font-light placeholder:text-xs placeholder:text-gray focus:outline-0 focus:border-main duration-300"
-            />
-            <input
-              type="number"
-              value={product.quantidade}
-              onChange={(e) =>
-                handleFieldChange(index, "quantidade", Number(e.target.value))
-              }
-              className="w-24 h-10 p-2 border border-gray rounded-lg placeholder:font-poppins placeholder:font-light placeholder:text-xs placeholder:text-gray focus:outline-0 focus:border-main duration-300"
-            />
-            <input
-              type="number"
-              value={product.precoUnitario}
-              readOnly
-              className="w-28 h-10 p-2 border border-gray rounded-lg placeholder:font-poppins placeholder:font-light placeholder:text-xs placeholder:text-gray focus:outline-0 focus:border-main duration-300"
-            />
-            <input
-              type="number"
-              value={product.precoTotalItem}
-              readOnly
-              className="w-28 h-10 p-2 border border-gray rounded-lg bg-gray-100 text-gray-600 placeholder:font-poppins placeholder:font-light placeholder:text-xs placeholder:text-gray"
-            />
+            /> */}
+            </div>
+            <div key={index} className="flex flex-col gap-1">
+              {index === 0 && (
+                <label className="font-poppins font-light text-sm">
+                  Quantidade
+                </label>
+              )}
+              <InputNumber
+                value={product.quantidade}
+                onChange={(e) =>
+                  handleFieldChange(index, "quantidade", Number(e.target.value))
+                }
+              />
+            </div>
+            <div key={index} className="flex flex-col gap-1">
+              {index === 0 && (
+                <label className="font-poppins font-light text-sm">
+                  Preço Unitário
+                </label>
+              )}
+              <InputNumber value={product.precoUnitario} readOnly />
+            </div>
+            <div key={index} className="flex flex-col gap-1">
+              {index === 0 && (
+                <label className="font-poppins font-light text-sm">
+                  Preço Total
+                </label>
+              )}
+              <InputNumber value={product.precoTotalItem} readOnly />
+            </div>
             {index === products.length - 1 ? (
               <button
                 type="button"

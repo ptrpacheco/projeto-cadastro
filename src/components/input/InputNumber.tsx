@@ -1,4 +1,3 @@
-
 interface InputNumberProps {
   label?: string;
   placeholder?: string;
@@ -17,7 +16,7 @@ const InputNumber = ({ label, placeholder, value, onChange, readOnly }: InputNum
         onChange={onChange}
         value={value}
         readOnly={readOnly}
-        className="w-full h-10 p-2 border border-gray rounded-lg placeholder:font-poppins placeholder:font-light placeholder:text-xs placeholder:text-gray focus:outline-0 focus:border-main duration-300"
+        className={`w-full h-10 p-2 border border-gray rounded-lg placeholder:font-poppins placeholder:font-light placeholder:text-xs placeholder:text-gray focus:outline-0 focus:border-main duration-300 ${readOnly ? "text-gray" : "text-black"}`}
       />
     </div>
   );
