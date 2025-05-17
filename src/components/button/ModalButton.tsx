@@ -7,7 +7,7 @@ const ModalButton = ({ onClick, children }: ModalButtonProps) => {
   return (
     <button
       onClick={onClick}
-      className={'w-full h-10 flex flex-row items-center justify-center gap-2 border border-gray rounded-lg font-poppins text-main text-sm cursor-pointer duration-200 hover:bg-background'}
+      className={'w-full h-10 px-2 flex flex-row items-center gap-2 border border-gray rounded-lg font-poppins text-gray text-sm cursor-pointer duration-200 hover:bg-background'}
     >
       {children}
     </button>

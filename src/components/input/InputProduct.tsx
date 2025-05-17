@@ -1,6 +1,9 @@
-import { axiosPrivate } from "../../api/axiosConfig";
+import { useEffect, useState } from "react";
 import ModalButton from "../button/ModalButton";
 import InputNumber from "./InputNumber";
+import ProductModal from "../modal/ProductModal";
+import { axiosPrivate } from "../../api/axiosConfig";
+import type { ProductData } from "../../interface/ProductData";
 
 interface Product {
   produtoId: number;
@@ -18,43 +21,50 @@ const InputProduct = ({ value, onChange }: InputProductProps) => {
   const products = value;
   const setProducts = onChange;
 
-  const handleCodigoChange = async (index: number, newCodigo: number) => {
-    try {
-      const response = await axiosPrivate.get(`/produto/${newCodigo}`);
-      const produto = response.data.data;
+  const [open, setOpen] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [productList, setProductList] = useState<ProductData[]>([]);
 
-      const updated = products.map((product, i) => {
-        if (i === index) {
-          const precoUnitario = produto.preco ?? 0;
-          const quantidade = product.quantidade;
-          return {
-            ...product,
-            produtoId: newCodigo,
-            precoUnitario,
-            precoTotalItem: precoUnitario * quantidade,
-          };
-        }
-        return product;
-      });
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axiosPrivate.get("/produto");
+        setProductList(response.data.data || []);
+      } catch (error) {
+        console.error("Erro ao buscar produtos:", error);
+      }
+    };
+    fetchProducts();
+  }, []);
 
-      setProducts(updated);
-    } catch (error) {
-      console.error("Erro ao buscar produto:", error);
+  const getProductName = (produtoId: number) => {
+    if (!produtoId) return "Selecione um produto";
+    const product = productList.find((p) => p.codigo === produtoId);
+    return product?.nome || "Produto não encontrado";
+  };
 
-      const updated = products.map((product, i) => {
-        if (i === index) {
-          return {
-            ...product,
-            produtoId: newCodigo,
-            precoUnitario: 0,
-            precoTotalItem: 0,
-          };
-        }
-        return product;
-      });
+  const handleSelectProduct = async (produtoId: number) => {
+    if (selectedIndex === null) return;
 
-      setProducts(updated);
-    }
+    const selectedProduct = productList.find((p) => p.codigo === produtoId);
+    if (!selectedProduct) return;
+
+    const updated = products.map((product, i) => {
+      if (i === selectedIndex) {
+        const precoUnitario = selectedProduct.preco || 0;
+        const quantidade = product.quantidade || 1;
+        return {
+          ...product,
+          produtoId: produtoId,
+          precoUnitario,
+          precoTotalItem: quantidade * precoUnitario,
+        };
+      }
+      return product;
+    });
+
+    setProducts(updated);
+    setOpen(false);
   };
 
   const handleFieldChange = (
@@ -95,106 +105,114 @@ const InputProduct = ({ value, onChange }: InputProductProps) => {
   };
 
   return (
-    <div className="w-full flex flex-col gap-4">
-      {products.map((product, index) => (
-        <div key={index} className="flex flex-col gap-1">
-          <div className="w-full flex flex-row gap-2 items-end">
-            <div key={index} className="w-full flex flex-col gap-1">
-              {index === 0 && (
-                <label className="font-poppins font-light text-sm">
-                  Produto
-                </label>
-              )}
-              <ModalButton />
-              {/* OLD CODE:
-              <input
-              type="number"
-              value={product.produtoId}
-              placeholder="Digite o Código do Produto"
-              onChange={(e) =>
-                handleCodigoChange(index, parseInt(e.target.value) || 0)
-              }
-              className="w-full h-10 p-2 border border-gray rounded-lg placeholder:font-poppins placeholder:font-light placeholder:text-xs placeholder:text-gray focus:outline-0 focus:border-main duration-300"
-            /> */}
-            </div>
-            <div key={index} className="flex flex-col gap-1">
-              {index === 0 && (
-                <label className="font-poppins font-light text-sm">
-                  Quantidade
-                </label>
-              )}
-              <InputNumber
-                value={product.quantidade}
-                onChange={(e) =>
-                  handleFieldChange(index, "quantidade", Number(e.target.value))
-                }
-              />
-            </div>
-            <div key={index} className="flex flex-col gap-1">
-              {index === 0 && (
-                <label className="font-poppins font-light text-sm">
-                  Preço Unitário
-                </label>
-              )}
-              <InputNumber value={product.precoUnitario} readOnly />
-            </div>
-            <div key={index} className="flex flex-col gap-1">
-              {index === 0 && (
-                <label className="font-poppins font-light text-sm">
-                  Preço Total
-                </label>
-              )}
-              <InputNumber value={product.precoTotalItem} readOnly />
-            </div>
-            {index === products.length - 1 ? (
-              <button
-                type="button"
-                onClick={handleAdd}
-                className="size-10 shrink-0 flex items-center justify-center border border-gray rounded-lg cursor-pointer duration-200 hover:bg-background"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="14"
-                  height="14"
-                  viewBox="0 0 10 10"
-                  fill="none"
+    <>
+      <ProductModal
+        open={open}
+        onClose={() => setOpen(false)}
+        onSelect={handleSelectProduct}
+      />
+      <div className="w-full flex flex-col gap-4">
+        {products.map((product, index) => (
+          <div key={index} className="flex flex-col gap-1">
+            <div className="w-full flex flex-row gap-2 items-end">
+              <div className="w-full flex flex-col gap-1">
+                {index === 0 && (
+                  <label className="font-poppins font-light text-sm">
+                    Produto
+                  </label>
+                )}
+                <ModalButton
+                  onClick={() => {
+                    setSelectedIndex(index);
+                    setOpen(true);
+                  }}
                 >
-                  <path
-                    d="M5 1V9M1 5H9"
-                    stroke="#c3c3c3"
-                    strokeWidth="1"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => handleRemove(index)}
-                className="size-10 shrink-0 flex items-center justify-center border border-gray rounded-lg cursor-pointer duration-200 hover:bg-background"
-              >
-                <svg
-                  width="14"
-                  height="2"
-                  viewBox="0 0 14 2"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
+                  {getProductName(product.produtoId)}
+                </ModalButton>
+              </div>
+              <div className="flex flex-col gap-1">
+                {index === 0 && (
+                  <label className="font-poppins font-light text-sm">
+                    Quantidade
+                  </label>
+                )}
+                <InputNumber
+                  value={product.quantidade}
+                  onChange={(e) =>
+                    handleFieldChange(
+                      index,
+                      "quantidade",
+                      Number(e.target.value)
+                    )
+                  }
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                {index === 0 && (
+                  <label className="font-poppins font-light text-sm">
+                    Preço Unitário
+                  </label>
+                )}
+                <InputNumber value={product.precoUnitario} readOnly />
+              </div>
+              <div className="flex flex-col gap-1">
+                {index === 0 && (
+                  <label className="font-poppins font-light text-sm">
+                    Preço Total
+                  </label>
+                )}
+                <InputNumber value={product.precoTotalItem} readOnly />
+              </div>
+              {index === products.length - 1 ? (
+                <button
+                  type="button"
+                  onClick={handleAdd}
+                  className="size-10 shrink-0 flex items-center justify-center border border-gray rounded-lg cursor-pointer duration-200 hover:bg-background"
                 >
-                  <path
-                    d="M1 1H13"
-                    stroke="#C3C3C3"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-            )}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 10 10"
+                    fill="none"
+                  >
+                    <path
+                      d="M5 1V9M1 5H9"
+                      stroke="#c3c3c3"
+                      strokeWidth="1"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => handleRemove(index)}
+                  className="size-10 shrink-0 flex items-center justify-center border border-gray rounded-lg cursor-pointer duration-200 hover:bg-background"
+                >
+                  <svg
+                    width="14"
+                    height="2"
+                    viewBox="0 0 14 2"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M1 1H13"
+                      stroke="#C3C3C3"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+              )}
+            </div>
           </div>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+    </>
   );
 };
 
