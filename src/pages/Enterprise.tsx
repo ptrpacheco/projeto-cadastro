@@ -3,15 +3,21 @@ import NavBar from "../components/SideBar";
 import { axiosPrivate } from "../api/axiosConfig";
 import { useEffect, useState } from "react";
 import CrudContainer from "../components/CrudContainer";
-import InputText from "../components/input/InputText";
-import Button from "../components/button/Button";
+import InputText from "../components/Input/InputText";
+import Button from "../components/Button/Button";
 import type { EnterpriseData } from "../interface/EnterpriseData";
-import InputTelephone from "../components/input/InputTelephone";
+import InputTelephone from "../components/Input/InputTelephone";
 import Line from "../components/Line";
-import InputSelect from "../components/input/InputSelect";
+import InputSelect from "../components/Input/InputSelect";
 import { UF } from "../constants/UF";
+import RequestError from "../components/Error/RequestError";
+import ErrorMessage from "../components/Error/ErrorMessage";
+import axios from "axios";
 
 const Enterprise = () => {
+  const [requestError, setRequestError] = useState<unknown | null>(null);
+  const [formError, setFormError] = useState<string>("");
+
   const [enterpriseData, setEnterpriseData] = useState<EnterpriseData>({
     id: 0,
     razaoSocial: "",
@@ -39,7 +45,13 @@ const Enterprise = () => {
       console.log("Dados sendo enviados no PUT:", enterpriseData);
       await axiosPrivate.put(`/empresa/8`, enterpriseData);
     } catch (error) {
-      console.error("Erro ao atualizar empresa:", error);
+      if (axios.isAxiosError(error)) {
+        const apiMessage = error.response?.data?.message;
+        setFormError(apiMessage);
+        console.error(error);
+      } else {
+        setFormError("Erro desconhecido ao atualizar empresa.");
+      }
     }
   };
 
@@ -48,9 +60,9 @@ const Enterprise = () => {
       try {
         const response = await axiosPrivate.get("/empresa/8");
         setEnterpriseData(response.data.data);
-      } catch (error) {
-        console.error("Erro ao buscar dados da empresa:", error);
-      }
+    } catch (error) {
+      setRequestError(error);
+    }
     };
 
     fetchEnterpriseData();
@@ -74,6 +86,13 @@ const Enterprise = () => {
               </div>
             </div>
             <div className="h-full max-h-152 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
+              {requestError instanceof Error && (
+                  <RequestError
+                    error={requestError}
+                    customMessage="Erro ao carregar os clientes."
+                  />
+                )}
+                {formError && <ErrorMessage message={formError} />}
               <div className="w-full flex flex-row gap-6">
                 <InputText
                   label="Nome da Empresa"

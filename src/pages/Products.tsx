@@ -1,24 +1,27 @@
 import Header from "../components/Header";
 import NavBar from "../components/SideBar";
-import EditButton from "../components/button/EditButton";
+import EditButton from "../components/Button/EditButton";
 import { axiosPrivate } from "../api/axiosConfig";
 import type { ProductData } from "../interface/ProductData";
 import { useEffect, useState } from "react";
 import CrudContainer from "../components/CrudContainer";
-import AddButton from "../components/button/AddButton";
-import CancelButton from "../components/CancelButton";
-import InputText from "../components/input/InputText";
-import FilterButton from "../components/button/FilterButton";
+import AddButton from "../components/Button/AddButton";
+import CancelButton from "../components/Button/CancelButton";
+import InputText from "../components/Input/InputText";
+import FilterButton from "../components/Button/FilterButton";
 import SearchBar from "../components/SearchBar";
-import Button from "../components/button/Button";
-import SecundaryButton from "../components/button/SecundaryButton";
-import InputNumber from "../components/input/InputNumber";
+import Button from "../components/Button/Button";
+import SecundaryButton from "../components/Button/SecundaryButton";
+import InputNumber from "../components/Input/InputNumber";
 import { ProductsHeader } from "../constants/CrudViewHeader";
 import type { ProductFamilyData } from "../interface/ProductFamilyData";
-import ModalButton from "../components/button/ModalButton";
-import ProductFamilyModal from "../components/modal/ProductFamilyModal";
-import SupplierModal from "../components/modal/SupplierModal";
+import ModalButton from "../components/Button/ModalButton";
+import ProductFamilyModal from "../components/Modal/ProductFamilyModal";
+import SupplierModal from "../components/Modal/SupplierModal";
 import type { SupplierData } from "../interface/SupplierData";
+import RequestError from "../components/Error/RequestError";
+import ErrorMessage from "../components/Error/ErrorMessage";
+import axios from "axios";
 
 const Products = () => {
   const [userState, setUserState] = useState<"view" | "add" | "edit">("view");
@@ -30,6 +33,8 @@ const Products = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [posts, setPosts] = useState<ProductData[]>([]);
+  const [requestError, setRequestError] = useState<unknown | null>(null);
+  const [formError, setFormError] = useState<string>("");
 
   const [productFamilyOpen, setProductFamilyOpen] = useState(false);
   const [productFamilyList, setProductFamilyList] = useState<
@@ -112,7 +117,7 @@ const Products = () => {
         const response = await axiosPrivate.get("/familia");
         setProductFamilyList(response.data.data || []);
       } catch (error) {
-        console.error("Erro ao buscar familias:", error);
+        setRequestError(error);
       }
     };
     fetchProductsFamilies();
@@ -141,12 +146,15 @@ const Products = () => {
   };
 
   useEffect(() => {
+    setIsLoading(true);
     const fetchSuppliers = async () => {
       try {
         const response = await axiosPrivate.get("/fornecedor");
         setSupplierList(response.data.data || []);
       } catch (error) {
-        console.error("Erro ao buscar clientes:", error);
+        setRequestError(error);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchSuppliers();
@@ -184,7 +192,7 @@ const Products = () => {
       const response = await axiosPrivate.get("/produto");
       setPosts(response.data.data);
     } catch (error) {
-      console.error("Erro ao buscar todos os produtos:", error);
+      setRequestError(error);
     } finally {
       setIsLoading(false);
     }
@@ -218,7 +226,7 @@ const Products = () => {
         setPosts([]);
       }
     } catch (error) {
-      console.error("Erro ao pesquisar:", error);
+      setRequestError(error);
       setPosts([]);
     } finally {
       setIsLoading(false);
@@ -237,7 +245,13 @@ const Products = () => {
       console.log("Produto criado:", response.data);
       setUserState("view");
     } catch (error) {
-      console.error("Erro ao adicionar produto:", error);
+      if (axios.isAxiosError(error)) {
+        const apiMessage = error.response?.data?.message;
+        setFormError(apiMessage);
+        console.error(error);
+      } else {
+        setFormError("Erro desconhecido ao adicionar produto.");
+      }
     }
   };
 
@@ -254,7 +268,13 @@ const Products = () => {
       await axiosPrivate.put(`/produto/${postToEditId}`, payload);
       setUserState("view");
     } catch (error) {
-      console.error("Erro ao atualizar produto:", error);
+      if (axios.isAxiosError(error)) {
+        const apiMessage = error.response?.data?.message;
+        setFormError(apiMessage);
+        console.error(error);
+      } else {
+        setFormError("Erro desconhecido ao atualizar produto.");
+      }
     }
   };
 
@@ -265,33 +285,42 @@ const Products = () => {
       await axiosPrivate.delete(`/produto/${postToEditId}`);
       setUserState("view");
     } catch (error) {
-      console.error("Erro ao apagar produto:", error);
+      if (axios.isAxiosError(error)) {
+        const apiMessage = error.response?.data?.message;
+        setFormError(apiMessage);
+        console.error(error);
+      } else {
+        setFormError("Erro desconhecido ao apagar produto.");
+      }
     }
   };
 
-  useEffect(() => {
-    const controller = new AbortController();
+useEffect(() => {
+  const controller = new AbortController();
 
-    const fetchPosts = async () => {
-      setIsLoading(true);
-      try {
-        const response = await axiosPrivate.get("/produto", {
-          signal: controller.signal,
-        });
-        setPosts(response.data.data);
-      } catch (error) {
-        console.error("Erro ao procurar produtos:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchPosts = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axiosPrivate.get("/produto", {
+        signal: controller.signal,
+      });
+      setPosts(response.data.data);
+      setRequestError(null);
+    } catch (error) {
+      if (axios.isCancel(error)) return;
+      setRequestError(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    fetchPosts();
+  fetchPosts();
 
-    return () => {
-      controller.abort();
-    };
-  }, []);
+  return () => {
+    controller.abort();
+  };
+}, []);
+
 
   return (
     <>
@@ -313,9 +342,17 @@ const Products = () => {
             {userState === "view" && (
               <>
                 <div className="flex flex-row justify-between items-center p-4 border-b border-gray">
-                  <h1 className="font-poppins font-semibold text-xl text-main">
-                    Produtos
-                  </h1>
+                  <div className="flex items-center gap-2">
+                    <h1 className="font-poppins font-semibold text-xl text-main">
+                      Produtos
+                    </h1>
+                    {requestError instanceof Error && (
+                      <RequestError
+                        error={requestError}
+                        customMessage="Erro ao carregar os produtos."
+                      />
+                    )}
+                  </div>
                   <AddButton
                     onClick={() => {
                       setUserState("add"), resetProductData();
@@ -461,6 +498,13 @@ const Products = () => {
                   </div>
                 </div>
                 <div className="h-full max-h-152 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
+                  {requestError instanceof Error && (
+                    <RequestError
+                      error={requestError}
+                      customMessage="Erro ao carregar os clientes."
+                    />
+                  )}
+                  {formError && <ErrorMessage message={formError} />}
                   <div className="w-full flex flex-row gap-6">
                     <div className="w-full flex flex-col gap-1">
                       <InputText
@@ -556,6 +600,13 @@ const Products = () => {
                   </div>
                 </div>
                 <div className="h-full max-h-152 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
+                  {requestError instanceof Error && (
+                    <RequestError
+                      error={requestError}
+                      customMessage="Erro ao carregar os clientes."
+                    />
+                  )}
+                  {formError && <ErrorMessage message={formError} />}
                   <div className="w-full flex flex-row gap-6">
                     <div className="w-full flex flex-col gap-1">
                       <InputText

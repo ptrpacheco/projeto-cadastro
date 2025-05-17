@@ -1,18 +1,21 @@
 import Header from "../components/Header";
 import NavBar from "../components/SideBar";
-import EditButton from "../components/button/EditButton";
+import EditButton from "../components/Button/EditButton";
 import { ProductsFamiliesHeader } from "../constants/CrudViewHeader";
 import { axiosPrivate } from "../api/axiosConfig";
 import { useEffect, useState } from "react";
 import CrudContainer from "../components/CrudContainer";
-import AddButton from "../components/button/AddButton";
-import CancelButton from "../components/CancelButton";
-import InputText from "../components/input/InputText";
-import FilterButton from "../components/button/FilterButton";
+import AddButton from "../components/Button/AddButton";
+import CancelButton from "../components/Button/CancelButton";
+import InputText from "../components/Input/InputText";
+import FilterButton from "../components/Button/FilterButton";
 import SearchBar from "../components/SearchBar";
-import Button from "../components/button/Button";
-import SecundaryButton from "../components/button/SecundaryButton";
+import Button from "../components/Button/Button";
+import SecundaryButton from "../components/Button/SecundaryButton";
 import type { ProductFamilyData } from "../interface/ProductFamilyData";
+import RequestError from "../components/Error/RequestError";
+import ErrorMessage from "../components/Error/ErrorMessage";
+import axios from "axios";
 
 const ProductsFamilies = () => {
   const [userState, setUserState] = useState<"view" | "add" | "edit">("view");
@@ -24,6 +27,8 @@ const ProductsFamilies = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [posts, setPosts] = useState<ProductFamilyData[]>([]);
+  const [requestError, setRequestError] = useState<unknown | null>(null);
+  const [formError, setFormError] = useState<string>("");
 
   const initialProductFamilyData: ProductFamilyData = {
     codigo: 0,
@@ -47,7 +52,7 @@ const ProductsFamilies = () => {
       const response = await axiosPrivate.get("/familia");
       setPosts(response.data.data);
     } catch (error) {
-      console.error("Erro ao buscar todos as famílias:", error);
+      setRequestError(error);
     } finally {
       setIsLoading(false);
     }
@@ -60,7 +65,7 @@ const ProductsFamilies = () => {
       setPostToEditId(codigo);
       setUserState("edit");
     } catch (error) {
-      console.error("Erro ao buscar família:", error);
+      setRequestError(error);
     }
   };
 
@@ -81,7 +86,7 @@ const ProductsFamilies = () => {
         setPosts([]);
       }
     } catch (error) {
-      console.error("Erro ao pesquisar:", error);
+      setRequestError(error);
       setPosts([]);
     } finally {
       setIsLoading(false);
@@ -94,7 +99,13 @@ const ProductsFamilies = () => {
       console.log("Família criada:", response.data);
       setUserState("view");
     } catch (error) {
-      console.error("Erro ao adicionar família:", error);
+      if (axios.isAxiosError(error)) {
+        const apiMessage = error.response?.data?.message;
+        setFormError(apiMessage);
+        console.error(error);
+      } else {
+        setFormError("Erro desconhecido ao adicionar família.");
+      }
     }
   };
 
@@ -106,7 +117,13 @@ const ProductsFamilies = () => {
       await axiosPrivate.put(`/familia/${postToEditId}`, productFamilyData);
       setUserState("view");
     } catch (error) {
-      console.error("Erro ao atualizar familia:", error);
+      if (axios.isAxiosError(error)) {
+        const apiMessage = error.response?.data?.message;
+        setFormError(apiMessage);
+        console.error(error);
+      } else {
+        setFormError("Erro desconhecido ao atualizar família.");
+      }
     }
   };
 
@@ -117,33 +134,42 @@ const ProductsFamilies = () => {
       await axiosPrivate.delete(`/familia/${postToEditId}`);
       setUserState("view");
     } catch (error) {
-      console.error("Erro ao apagar família:", error);
+      if (axios.isAxiosError(error)) {
+        const apiMessage = error.response?.data?.message;
+        setFormError(apiMessage);
+        console.error(error);
+      } else {
+        setFormError("Erro desconhecido ao apagar família.");
+      }
     }
   };
 
-  useEffect(() => {
-    const controller = new AbortController();
+useEffect(() => {
+  const controller = new AbortController();
 
-    const fetchPosts = async () => {
-      setIsLoading(true);
-      try {
-        const response = await axiosPrivate.get("/familia", {
-          signal: controller.signal,
-        });
-        setPosts(response.data.data);
-      } catch (error) {
-        console.error("Erro ao procurar família:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchPosts = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axiosPrivate.get("/familia", {
+        signal: controller.signal,
+      });
+      setPosts(response.data.data);
+      setRequestError(null);
+    } catch (error) {
+      if (axios.isCancel(error)) return;
+      setRequestError(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    fetchPosts();
+  fetchPosts();
 
-    return () => {
-      controller.abort();
-    };
-  }, []);
+  return () => {
+    controller.abort();
+  };
+}, []);
+
 
   return (
     <div className="w-screen h-screen flex flex-col items-center justify-center overflow-hidden">
@@ -154,9 +180,17 @@ const ProductsFamilies = () => {
           {userState === "view" && (
             <>
               <div className="flex flex-row justify-between items-center p-4 border-b border-gray">
-                <h1 className="font-poppins font-semibold text-xl text-main">
-                  Famílias Produtos
-                </h1>
+                <div className="flex items-center gap-2">
+                  <h1 className="font-poppins font-semibold text-xl text-main">
+                    Famílias Produtos
+                  </h1>
+                  {requestError instanceof Error && (
+                    <RequestError
+                      error={requestError}
+                      customMessage="Erro ao carregar as famílias."
+                    />
+                  )}
+                </div>
                 <AddButton
                   onClick={() => {
                     setUserState("add"), resetProductFamilyData();
@@ -278,6 +312,13 @@ const ProductsFamilies = () => {
                 </div>
               </div>
               <div className="h-full max-h-152 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
+                {requestError instanceof Error && (
+                  <RequestError
+                    error={requestError}
+                    customMessage="Erro ao carregar os clientes."
+                  />
+                )}
+                {formError && <ErrorMessage message={formError} />}
                 <InputText
                   label="Nome do Família"
                   placeholder="Digite o Nome do Família..."
@@ -329,6 +370,13 @@ const ProductsFamilies = () => {
                 </div>
               </div>
               <div className="h-full max-h-152 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
+                {requestError instanceof Error && (
+                  <RequestError
+                    error={requestError}
+                    customMessage="Erro ao carregar os clientes."
+                  />
+                )}
+                {formError && <ErrorMessage message={formError} />}
                 <InputText
                   label="Nome do Família"
                   placeholder="Digite o Nome do Família..."

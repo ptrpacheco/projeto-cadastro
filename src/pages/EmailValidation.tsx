@@ -1,5 +1,6 @@
 import { LogoBlackHorizontal } from "../assets";
 import { Link } from "react-router-dom";
+import Button from "../components/Button/Button";
 
 const EmailValidation = () => {
   return (
@@ -17,16 +18,13 @@ const EmailValidation = () => {
                 Validação de Email
               </h1>
               <p className="font-poppins font-light text-sm">
-                O seguinte email abaixo foi validado com sucesso:
+                Seu e-mail foi validado com sucesso!
               </p>
-              <p className="font-poppins font-bold text-sm">email@email.com</p>
             </div>
           </div>
           <div className="w-full h-[1px] bg-gray rounded-full"></div>
-          <Link to="/login">
-            <button className="w-full h-10 bg-main rounded-lg font-poppins font-semibold text-white text-sm hover:opacity-60 cursor-pointer duration-300">
-              Voltar à página de Login
-            </button>
+          <Link to="/">
+            <Button>Voltar à página de Login</Button>
           </Link>
         </div>
         <div className="w-full h-full bg-[url(./src/assets/images/side-image.png)] bg-cover bg-no-repeat bg-center rounded-lg"></div>

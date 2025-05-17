@@ -1,23 +1,26 @@
 import Header from "../components/Header";
 import NavBar from "../components/SideBar";
-import EditButton from "../components/button/EditButton";
+import EditButton from "../components/Button/EditButton";
 import { ClientsHeader } from "../constants/CrudViewHeader";
 import { axiosPrivate } from "../api/axiosConfig";
 import type { ClientData } from "../interface/ClientData";
 import { useEffect, useState } from "react";
 import CrudContainer from "../components/CrudContainer";
-import AddButton from "../components/button/AddButton";
-import CancelButton from "../components/CancelButton";
-import InputText from "../components/input/InputText";
+import AddButton from "../components/Button/AddButton";
+import CancelButton from "../components/Button/CancelButton";
+import InputText from "../components/Input/InputText";
 import Line from "../components/Line";
-import FilterButton from "../components/button/FilterButton";
-import InputSelect from "../components/input/InputSelect";
+import FilterButton from "../components/Button/FilterButton";
+import InputSelect from "../components/Input/InputSelect";
 import { TipoPessoa } from "../constants/TipoPessoa";
 import { UF } from "../constants/UF";
-import InputTelephone from "../components/input/InputTelephone";
+import InputTelephone from "../components/Input/InputTelephone";
 import SearchBar from "../components/SearchBar";
-import Button from "../components/button/Button";
-import SecundaryButton from "../components/button/SecundaryButton";
+import Button from "../components/Button/Button";
+import SecundaryButton from "../components/Button/SecundaryButton";
+import RequestError from "../components/Error/RequestError";
+import ErrorMessage from "../components/Error/ErrorMessage";
+import axios from "axios";
 
 const Clients = () => {
   const [userState, setUserState] = useState<"view" | "add" | "edit">("view");
@@ -29,6 +32,8 @@ const Clients = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [posts, setPosts] = useState<ClientData[]>([]);
+  const [requestError, setRequestError] = useState<unknown | null>(null);
+  const [formError, setFormError] = useState<string>("");
 
   const initialClientData: ClientData = {
     cpfOuCnpj: "",
@@ -87,8 +92,9 @@ const Clients = () => {
     try {
       const response = await axiosPrivate.get("/cliente");
       setPosts(response.data.data);
+      setRequestError(null);
     } catch (error) {
-      console.error("Erro ao buscar buscar clientes:", error);
+      setRequestError(error);
     } finally {
       setIsLoading(false);
     }
@@ -98,10 +104,11 @@ const Clients = () => {
     try {
       const response = await axiosPrivate.get(`/cliente/${cpfOuCnpj}`);
       setClientData(response.data.data);
+      setRequestError(null);
       setPostToEditId(cpfOuCnpj);
       setUserState("edit");
     } catch (error) {
-      console.error("Erro ao buscar cliente:", error);
+      setRequestError(error);
     }
   };
 
@@ -114,6 +121,7 @@ const Clients = () => {
         `/cliente/${filterType.toLowerCase()}${searchTerm}`
       );
       const data = response.data.data;
+      setRequestError(null);
       if (Array.isArray(data)) {
         setPosts(data);
       } else if (data) {
@@ -122,7 +130,7 @@ const Clients = () => {
         setPosts([]);
       }
     } catch (error) {
-      console.error("Erro ao pesquisar:", error);
+      setRequestError(error);
       setPosts([]);
     } finally {
       setIsLoading(false);
@@ -133,10 +141,17 @@ const Clients = () => {
     try {
       const response = await axiosPrivate.post("/cliente", clientData);
       console.log("Cliente criado:", response.data);
+      setFormError("");
       setUserState("view");
       fetchAllPosts();
     } catch (error) {
-      console.error("Erro ao adicionar cliente:", error);
+      if (axios.isAxiosError(error)) {
+        const apiMessage = error.response?.data?.message;
+        setFormError(apiMessage);
+        console.error(error);
+      } else {
+        setFormError("Erro desconhecido ao adicionar cliente.");
+      }
     }
   };
 
@@ -146,10 +161,17 @@ const Clients = () => {
     try {
       console.log("Dados sendo enviados no PUT:", clientData);
       await axiosPrivate.put(`/cliente/${postToEditId}`, clientData);
+      setFormError("");
       setUserState("view");
       fetchAllPosts();
     } catch (error) {
-      console.error("Erro ao atualizar cliente:", error);
+      if (axios.isAxiosError(error)) {
+        const apiMessage = error.response?.data?.message;
+        setFormError(apiMessage);
+        console.error(error);
+      } else {
+        setFormError("Erro desconhecido ao atualizar cliente.");
+      }
     }
   };
 
@@ -158,36 +180,46 @@ const Clients = () => {
 
     try {
       await axiosPrivate.delete(`/cliente/${postToEditId}`);
+      setFormError("");
       setUserState("view");
       fetchAllPosts();
     } catch (error) {
-      console.error("Erro ao apagar cliente:", error);
+      if (axios.isAxiosError(error)) {
+        const apiMessage = error.response?.data?.message;
+        setFormError(apiMessage);
+        console.error(error);
+      } else {
+        setFormError("Erro desconhecido ao apagar cliente.");
+      }
     }
   };
 
-  useEffect(() => {
-    const controller = new AbortController();
+useEffect(() => {
+  const controller = new AbortController();
 
-    const fetchPosts = async () => {
-      setIsLoading(true);
-      try {
-        const response = await axiosPrivate.get("/cliente", {
-          signal: controller.signal,
-        });
-        setPosts(response.data.data);
-      } catch (error) {
-        console.error("Erro ao buscar clientes:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchPosts = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axiosPrivate.get("/cliente", {
+        signal: controller.signal,
+      });
+      setPosts(response.data.data);
+      setRequestError(null);
+    } catch (error) {
+      if (axios.isCancel(error)) return;
+      setRequestError(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    fetchPosts();
+  fetchPosts();
 
-    return () => {
-      controller.abort();
-    };
-  }, []);
+  return () => {
+    controller.abort();
+  };
+}, []);
+
 
   return (
     <div className="w-screen h-screen flex flex-col items-center justify-center overflow-hidden">
@@ -198,9 +230,17 @@ const Clients = () => {
           {userState === "view" && (
             <>
               <div className="flex flex-row justify-between items-center p-4 border-b border-gray">
+                <div className="flex items-center gap-2">
                 <h1 className="font-poppins font-semibold text-xl text-main">
                   Clientes
                 </h1>
+                {requestError instanceof Error && (
+                  <RequestError
+                    error={requestError}
+                    customMessage="Erro ao carregar os clientes."
+                  />
+                )}
+                </div>
                 <AddButton
                   onClick={() => {
                     resetClientData();
@@ -273,7 +313,6 @@ const Clients = () => {
                   );
                 })}
               </ul>
-
               {isLoading ? (
                 <div className="w-full py-10 flex items-center justify-center">
                   <p className="text-sm font-poppins text-gray">
@@ -332,7 +371,11 @@ const Clients = () => {
             <>
               <div className="flex flex-row justify-between items-center p-4 border-b border-gray">
                 <div className="flex flex-row items-center gap-2">
-                  <CancelButton onClick={() => setUserState("view")} />
+                  <CancelButton
+                    onClick={() => {
+                      setUserState("view"), setFormError("");
+                    }}
+                  />
                   <h1 className="font-poppins font-semibold text-xl text-main">
                     Clientes
                   </h1>
@@ -342,6 +385,13 @@ const Clients = () => {
                 </div>
               </div>
               <div className="h-full max-h-152 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
+                {requestError instanceof Error && (
+                  <RequestError
+                    error={requestError}
+                    customMessage="Erro ao carregar os clientes."
+                  />
+                )}
+                {formError && <ErrorMessage message={formError} />}
                 <div className="w-full flex flex-row gap-6">
                   <InputText
                     label="Nome do Cliente"
@@ -537,7 +587,11 @@ const Clients = () => {
             <>
               <div className="flex flex-row justify-between items-center p-4 border-b border-gray">
                 <div className="flex flex-row items-center gap-2">
-                  <CancelButton onClick={() => setUserState("view")} />
+                  <CancelButton
+                    onClick={() => {
+                      setUserState("view"), setFormError("");
+                    }}
+                  />
                   <h1 className="font-poppins font-semibold text-xl text-main">
                     Clientes
                   </h1>
@@ -547,6 +601,13 @@ const Clients = () => {
                 </div>
               </div>
               <div className="h-full max-h-152 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
+                {requestError instanceof Error && (
+                  <RequestError
+                    error={requestError}
+                    customMessage="Erro ao carregar os clientes."
+                  />
+                )}
+                {formError && <ErrorMessage message={formError} />}
                 <div className="w-full flex flex-row gap-6">
                   <InputText
                     label="Nome do Cliente"

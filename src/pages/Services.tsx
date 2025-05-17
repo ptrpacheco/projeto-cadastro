@@ -1,27 +1,30 @@
 import Header from "../components/Header";
 import NavBar from "../components/SideBar";
-import EditButton from "../components/button/EditButton";
+import EditButton from "../components/Button/EditButton";
 import { ServicesHeader } from "../constants/CrudViewHeader";
 import { axiosPrivate } from "../api/axiosConfig";
 import { useEffect, useState } from "react";
 import CrudContainer from "../components/CrudContainer";
-import AddButton from "../components/button/AddButton";
-import CancelButton from "../components/CancelButton";
-import InputText from "../components/input/InputText";
-import FilterButton from "../components/button/FilterButton";
+import AddButton from "../components/Button/AddButton";
+import CancelButton from "../components/Button/CancelButton";
+import InputText from "../components/Input/InputText";
+import FilterButton from "../components/Button/FilterButton";
 import SearchBar from "../components/SearchBar";
-import Button from "../components/button/Button";
-import SecundaryButton from "../components/button/SecundaryButton";
+import Button from "../components/Button/Button";
+import SecundaryButton from "../components/Button/SecundaryButton";
 import type { ServiceData } from "../interface/ServiceData";
 import Line from "../components/Line";
-import InputProduct from "../components/input/InputProduct";
-import InputNumber from "../components/input/InputNumber";
-import InputSelect from "../components/input/InputSelect";
+import InputProduct from "../components/Input/InputProduct";
+import InputNumber from "../components/Input/InputNumber";
+import InputSelect from "../components/Input/InputSelect";
 import { TipoDesconto } from "../constants/TipoDesconto";
-import PDFButton from "../components/button/PDFButton";
-import ModalButton from "../components/button/ModalButton";
+import PDFButton from "../components/Button/PDFButton";
+import ModalButton from "../components/Button/ModalButton";
 import type { ClientData } from "../interface/ClientData";
-import ClientModal from "../components/modal/ClientModal";
+import ClientModal from "../components/Modal/ClientModal";
+import RequestError from "../components/Error/RequestError";
+import ErrorMessage from "../components/Error/ErrorMessage";
+import axios from "axios";
 
 const Services = () => {
   const [userState, setUserState] = useState<"view" | "add" | "edit">("view");
@@ -33,6 +36,8 @@ const Services = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [posts, setPosts] = useState<ServiceData[]>([]);
+  const [requestError, setRequestError] = useState<unknown | null>(null);
+  const [formError, setFormError] = useState<string>("");
 
   const [clientOpen, setClientOpen] = useState(false);
   const [clientList, setClientList] = useState<ClientData[]>([]);
@@ -137,7 +142,7 @@ const Services = () => {
         const response = await axiosPrivate.get("/cliente");
         setClientList(response.data.data || []);
       } catch (error) {
-        console.error("Erro ao buscar clientes:", error);
+        setRequestError(error);
       }
     };
     fetchClients();
@@ -173,7 +178,7 @@ const Services = () => {
       const response = await axiosPrivate.get("/servico");
       setPosts(response.data.data);
     } catch (error) {
-      console.error("Erro ao buscar todos os serviços:", error);
+      setRequestError(error);
     } finally {
       setIsLoading(false);
     }
@@ -186,7 +191,7 @@ const Services = () => {
       setPostToEditId(codigo);
       setUserState("edit");
     } catch (error) {
-      console.error("Erro ao buscar servico:", error);
+      setRequestError(error);
     }
   };
 
@@ -229,7 +234,7 @@ const Services = () => {
         setPosts([]);
       }
     } catch (error) {
-      console.error("Erro ao pesquisar:", error);
+      setRequestError(error);
       setPosts([]);
     } finally {
       setIsLoading(false);
@@ -246,7 +251,13 @@ const Services = () => {
       console.log("Serviço criado:", response.data);
       setUserState("view");
     } catch (error) {
-      console.error("Erro ao adicionar serviço:", error);
+      if (axios.isAxiosError(error)) {
+        const apiMessage = error.response?.data?.message;
+        setFormError(apiMessage);
+        console.error(error);
+      } else {
+        setFormError("Erro desconhecido ao adicionar serviço.");
+      }
     }
   };
 
@@ -261,7 +272,13 @@ const Services = () => {
       await axiosPrivate.put(`/servico/${postToEditId}`, payload);
       setUserState("view");
     } catch (error) {
-      console.error("Erro ao atualizar serviço:", error);
+      if (axios.isAxiosError(error)) {
+        const apiMessage = error.response?.data?.message;
+        setFormError(apiMessage);
+        console.error(error);
+      } else {
+        setFormError("Erro desconhecido ao atualizer serviço.");
+      }
     }
   };
 
@@ -272,7 +289,13 @@ const Services = () => {
       await axiosPrivate.delete(`/servico/${postToEditId}`);
       setUserState("view");
     } catch (error) {
-      console.error("Erro ao apagar serviço:", error);
+      if (axios.isAxiosError(error)) {
+        const apiMessage = error.response?.data?.message;
+        setFormError(apiMessage);
+        console.error(error);
+      } else {
+        setFormError("Erro desconhecido ao apagar serviço.");
+      }
     }
   };
 
@@ -299,29 +322,32 @@ const Services = () => {
     }));
   }, [serviceData.itens, serviceData.maoDeObra.preco, serviceData.desconto]);
 
-  useEffect(() => {
-    const controller = new AbortController();
+useEffect(() => {
+  const controller = new AbortController();
 
-    const fetchPosts = async () => {
-      setIsLoading(true);
-      try {
-        const response = await axiosPrivate.get("/servico", {
-          signal: controller.signal,
-        });
-        setPosts(response.data.data);
-      } catch (error) {
-        console.error("Erro ao procurar serviços:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchPosts = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axiosPrivate.get("/servico", {
+        signal: controller.signal,
+      });
+      setPosts(response.data.data);
+      setRequestError(null);
+    } catch (error) {
+      if (axios.isCancel(error)) return;
+      setRequestError(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    fetchPosts();
+  fetchPosts();
 
-    return () => {
-      controller.abort();
-    };
-  }, []);
+  return () => {
+    controller.abort();
+  };
+}, []);
+
 
   return (
     <>
@@ -338,9 +364,17 @@ const Services = () => {
             {userState === "view" && (
               <>
                 <div className="flex flex-row justify-between items-center p-4 border-b border-gray">
-                  <h1 className="font-poppins font-semibold text-xl text-main">
-                    Serviços
-                  </h1>
+                  <div className="flex items-center gap-2">
+                    <h1 className="font-poppins font-semibold text-xl text-main">
+                      Serviços
+                    </h1>
+                    {requestError instanceof Error && (
+                      <RequestError
+                        error={requestError}
+                        customMessage="Erro ao carregar os serviços."
+                      />
+                    )}
+                  </div>
                   <AddButton
                     onClick={() => {
                       setUserState("add"), resetServiceData();
@@ -477,6 +511,13 @@ const Services = () => {
                   </div>
                 </div>
                 <div className="h-full max-h-152 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
+                  {requestError instanceof Error && (
+                    <RequestError
+                      error={requestError}
+                      customMessage="Erro ao carregar os serviços."
+                    />
+                  )}
+                  {formError && <ErrorMessage message={formError} />}
                   <div className="w-full flex flex-col gap-1">
                     <label className="font-poppins font-light text-sm">
                       Cliente
@@ -627,6 +668,13 @@ const Services = () => {
                   </div>
                 </div>
                 <div className="h-full max-h-152 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
+                  {requestError instanceof Error && (
+                    <RequestError
+                      error={requestError}
+                      customMessage="Erro ao carregar os serviços."
+                    />
+                  )}
+                  {formError && <ErrorMessage message={formError} />}
                   <div className="w-full flex flex-col gap-1">
                     <div className="w-full flex flex-col gap-1">
                       <label className="font-poppins font-light text-sm">
