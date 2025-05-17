@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { axiosPrivate } from "../../api/axiosConfig";
-import CancelButton from "../CancelButton";
+import CancelButton from "../Button/CancelButton";
 import type { SupplierData } from "../../interface/SupplierData";
 
 interface SupplierModalProps {
@@ -10,9 +10,7 @@ interface SupplierModalProps {
 }
 
 const SupplierModal = ({ open, onClose, onSelect }: SupplierModalProps) => {
-  const [clientList, setClientList] = useState<SupplierData[]>([
-   
-  ])
+  const [clientList, setClientList] = useState<SupplierData[]>([]);
 
   useEffect(() => {
     const fetchSuppliers = async () => {
@@ -32,7 +30,11 @@ const SupplierModal = ({ open, onClose, onSelect }: SupplierModalProps) => {
         open ? "visible bg-black/20" : "invisible"
       }`}
     >
-      <div className={`bg-white rounded-lg w-128 max-h-[80vh] overflow-y-auto transition-all ${open ? "scale-100 opacity-100" : "scale-80 opacity-0"}`}>
+      <div
+        className={`bg-white rounded-lg w-128 max-h-[80vh] overflow-y-auto transition-all ${
+          open ? "scale-100 opacity-100" : "scale-80 opacity-0"
+        }`}
+      >
         <div className="flex flex-row justify-between items-center p-4 border-b border-gray">
           <div className="flex flex-row items-center gap-2">
             <CancelButton onClick={onClose} />
@@ -48,9 +50,9 @@ const SupplierModal = ({ open, onClose, onSelect }: SupplierModalProps) => {
               onClick={() => onSelect(cliente.cpfOuCnpj)}
               className="cursor-pointer duration-200 hover:bg-background p-2 rounded"
             >
-               <div className="flex flex-row justify-between">
-                  <span>{cliente.nomeOuRazaoSocial}</span>
-               </div>
+              <div className="flex flex-row justify-between">
+                <span>{cliente.nomeOuRazaoSocial}</span>
+              </div>
             </li>
           ))}
         </ul>

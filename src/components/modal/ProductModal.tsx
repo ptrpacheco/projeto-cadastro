@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { ProductData } from "../../interface/ProductData";
 import { axiosPrivate } from "../../api/axiosConfig";
-import CancelButton from "../CancelButton";
+import CancelButton from "../Button/CancelButton";
 
 interface ProductModalProps {
   open: boolean;
@@ -10,7 +10,7 @@ interface ProductModalProps {
 }
 
 const ProductModal = ({ open, onClose, onSelect }: ProductModalProps) => {
-  const [productList, setProductList] = useState<ProductData[]>([])
+  const [productList, setProductList] = useState<ProductData[]>([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -30,7 +30,11 @@ const ProductModal = ({ open, onClose, onSelect }: ProductModalProps) => {
         open ? "visible bg-black/20" : "invisible"
       }`}
     >
-      <div className={`bg-white rounded-lg w-128 max-h-[80vh] overflow-y-auto transition-all ${open ? "scale-100 opacity-100" : "scale-80 opacity-0"}`}>
+      <div
+        className={`bg-white rounded-lg w-128 max-h-[80vh] overflow-y-auto transition-all ${
+          open ? "scale-100 opacity-100" : "scale-80 opacity-0"
+        }`}
+      >
         <div className="flex flex-row justify-between items-center p-4 border-b border-gray">
           <div className="flex flex-row items-center gap-2">
             <CancelButton onClick={onClose} />
@@ -46,10 +50,10 @@ const ProductModal = ({ open, onClose, onSelect }: ProductModalProps) => {
               onClick={() => onSelect(produto.codigo)}
               className="cursor-pointer duration-200 hover:bg-background p-2 rounded"
             >
-               <div className="flex flex-row justify-between">
-                  <span>{produto.familia.nome}</span>
-                  <span>{produto.nome}</span>
-               </div>
+              <div className="flex flex-row justify-between">
+                <span>{produto.familia.nome}</span>
+                <span>{produto.nome}</span>
+              </div>
             </li>
           ))}
         </ul>

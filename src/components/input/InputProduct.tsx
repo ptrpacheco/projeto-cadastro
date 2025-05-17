@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import ModalButton from "../button/ModalButton";
+import ModalButton from "../Button/ModalButton";
 import InputNumber from "./InputNumber";
-import ProductModal from "../modal/ProductModal";
+import ProductModal from "../Modal/ProductModal";
 import { axiosPrivate } from "../../api/axiosConfig";
 import type { ProductData } from "../../interface/ProductData";
 

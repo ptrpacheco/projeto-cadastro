@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { axiosPrivate } from "../../api/axiosConfig";
-import CancelButton from "../CancelButton";
+import CancelButton from "../Button/CancelButton";
 import type { ProductFamilyData } from "../../interface/ProductFamilyData";
 
 interface ProductFamilyModalProps {
