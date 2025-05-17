@@ -3,28 +3,31 @@ import { useNavigate } from "react-router-dom";
 import { LoginService } from "./service/LoginService";
 import { LogoBlackHorizontal } from "./assets";
 import Line from "./components/Line";
-import InputText from "./components/input/InputText";
-import InputPassword from "./components/input/InputPassword";
-import Button from "./components/button/Button";
+import InputText from "./components/Input/InputText";
+import InputPassword from "./components/Input/InputPassword";
+import Button from "./components/Button/Button";
+import ErrorMessage from "./components/Error/ErrorMessage";
 
 function App() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
+  const [error, setError] = useState("");
+
   const loginService = useMemo(() => new LoginService(), []);
   const navigate = useNavigate();
 
   const efetuarLogin = () => {
+    setError("");
     loginService
       .login(email, senha)
       .then((response) => {
         console.log("Sucesso");
-        console.log(response.data);
         localStorage.setItem("ACCESS_TOKEN", response.data);
         navigate("/clientes");
       })
-      .catch(() => {
-        console.log("Erro");
+      .catch((err) => {
+        setError("Email ou senha inválidos.");
       });
   };
 
@@ -69,6 +72,7 @@ function App() {
               onChange={(e) => setSenha(e.target.value)}
             />
           </div>
+          {error && <ErrorMessage message={error} />}
           <Button onClick={efetuarLogin}>Fazer Login</Button>
         </div>
       </div>

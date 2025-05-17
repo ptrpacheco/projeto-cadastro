@@ -1,23 +1,26 @@
 import Header from "../components/Header";
 import NavBar from "../components/SideBar";
-import EditButton from "../components/button/EditButton";
+import EditButton from "../components/Button/EditButton";
 import { ClientsHeader } from "../constants/CrudViewHeader";
 import { axiosPrivate } from "../api/axiosConfig";
 import type { SupplierData } from "../interface/SupplierData";
 import { useEffect, useState } from "react";
 import CrudContainer from "../components/CrudContainer";
-import AddButton from "../components/button/AddButton";
-import CancelButton from "../components/CancelButton";
-import InputText from "../components/input/InputText";
+import AddButton from "../components/Button/AddButton";
+import CancelButton from "../components/Button/CancelButton";
+import InputText from "../components/Input/InputText";
 import Line from "../components/Line";
-import FilterButton from "../components/button/FilterButton";
-import InputSelect from "../components/input/InputSelect";
+import FilterButton from "../components/Button/FilterButton";
+import InputSelect from "../components/Input/InputSelect";
 import { TipoPessoa } from "../constants/TipoPessoa";
 import { UF } from "../constants/UF";
-import InputTelephone from "../components/input/InputTelephone";
+import InputTelephone from "../components/Input/InputTelephone";
 import SearchBar from "../components/SearchBar";
-import Button from "../components/button/Button";
-import SecundaryButton from "../components/button/SecundaryButton";
+import Button from "../components/Button/Button";
+import SecundaryButton from "../components/Button/SecundaryButton";
+import RequestError from "../components/Error/RequestError";
+import ErrorMessage from "../components/Error/ErrorMessage";
+import axios from "axios";
 
 const Suppliers = () => {
   const [userState, setUserState] = useState<"view" | "add" | "edit">("view");
@@ -29,6 +32,8 @@ const Suppliers = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [posts, setPosts] = useState<SupplierData[]>([]);
+  const [requestError, setRequestError] = useState<unknown | null>(null);
+  const [formError, setFormError] = useState<string>("");
 
   const initialSupplierData: SupplierData = {
     cpfOuCnpj: "",
@@ -88,7 +93,7 @@ const Suppliers = () => {
       const response = await axiosPrivate.get("/fornecedor");
       setPosts(response.data.data);
     } catch (error) {
-      console.error("Erro ao buscar todos os fornecedores:", error);
+      setRequestError(error);
     } finally {
       setIsLoading(false);
     }
@@ -101,7 +106,7 @@ const Suppliers = () => {
       setPostToEditId(cpfOuCnpj);
       setUserState("edit");
     } catch (error) {
-      console.error("Erro ao buscar fornecedor:", error);
+      setRequestError(error);
     }
   };
 
@@ -122,7 +127,7 @@ const Suppliers = () => {
         setPosts([]);
       }
     } catch (error) {
-      console.error("Erro ao pesquisar:", error);
+      setRequestError(error);
       setPosts([]);
     } finally {
       setIsLoading(false);
@@ -135,7 +140,13 @@ const Suppliers = () => {
       console.log("Fornecedor criado:", response.data);
       setUserState("view");
     } catch (error) {
-      console.error("Erro ao adicionar fornecedor:", error);
+      if (axios.isAxiosError(error)) {
+        const apiMessage = error.response?.data?.message;
+        setFormError(apiMessage);
+        console.error(error);
+      } else {
+        setFormError("Erro desconhecido ao adicionar fornecedor.");
+      }
     }
   };
 
@@ -147,7 +158,13 @@ const Suppliers = () => {
       await axiosPrivate.put(`/fornecedor/${postToEditId}`, supplierData);
       setUserState("view");
     } catch (error) {
-      console.error("Erro ao atualizar fornecedor:", error);
+      if (axios.isAxiosError(error)) {
+        const apiMessage = error.response?.data?.message;
+        setFormError(apiMessage);
+        console.error(error);
+      } else {
+        setFormError("Erro desconhecido ao atualizar fornecedor.");
+      }
     }
   };
 
@@ -158,33 +175,42 @@ const Suppliers = () => {
       await axiosPrivate.delete(`/fornecedor/${postToEditId}`);
       setUserState("view");
     } catch (error) {
-      console.error("Erro ao apagar fornecedor:", error);
+      if (axios.isAxiosError(error)) {
+        const apiMessage = error.response?.data?.message;
+        setFormError(apiMessage);
+        console.error(error);
+      } else {
+        setFormError("Erro desconhecido ao apagar fornecedor.");
+      }
     }
   };
 
-  useEffect(() => {
-    const controller = new AbortController();
+useEffect(() => {
+  const controller = new AbortController();
 
-    const fetchPosts = async () => {
-      setIsLoading(true);
-      try {
-        const response = await axiosPrivate.get("/fornecedor", {
-          signal: controller.signal,
-        });
-        setPosts(response.data.data);
-      } catch (error) {
-        console.error("Erro ao procurar fornecedores:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchPosts = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axiosPrivate.get("/fornecedor", {
+        signal: controller.signal,
+      });
+      setPosts(response.data.data);
+      setRequestError(null);
+    } catch (error) {
+      if (axios.isCancel(error)) return;
+      setRequestError(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    fetchPosts();
+  fetchPosts();
 
-    return () => {
-      controller.abort();
-    };
-  }, []);
+  return () => {
+    controller.abort();
+  };
+}, []);
+
 
   return (
     <div className="w-screen h-screen flex flex-col items-center justify-center overflow-hidden">
@@ -195,9 +221,17 @@ const Suppliers = () => {
           {userState === "view" && (
             <>
               <div className="flex flex-row justify-between items-center p-4 border-b border-gray">
-                <h1 className="font-poppins font-semibold text-xl text-main">
-                  Fornecedores
-                </h1>
+                <div className="flex items-center gap-2">
+                  <h1 className="font-poppins font-semibold text-xl text-main">
+                    Fornecedores
+                  </h1>
+                  {requestError instanceof Error && (
+                    <RequestError
+                      error={requestError}
+                      customMessage="Erro ao carregar os fornecedores."
+                    />
+                  )}
+                </div>
                 <AddButton
                   onClick={() => {
                     setUserState("add"), resetSupplierData();
@@ -338,6 +372,13 @@ const Suppliers = () => {
                 </div>
               </div>
               <div className="h-full max-h-152 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
+                {requestError instanceof Error && (
+                  <RequestError
+                    error={requestError}
+                    customMessage="Erro ao carregar os clientes."
+                  />
+                )}
+                {formError && <ErrorMessage message={formError} />}
                 <div className="w-full flex flex-row gap-6">
                   <InputText
                     label="Nome do Fornecedor"
@@ -546,6 +587,13 @@ const Suppliers = () => {
                 </div>
               </div>
               <div className="h-full max-h-152 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
+                {requestError instanceof Error && (
+                  <RequestError
+                    error={requestError}
+                    customMessage="Erro ao carregar os clientes."
+                  />
+                )}
+                {formError && <ErrorMessage message={formError} />}
                 <div className="w-full flex flex-row gap-6">
                   <InputText
                     label="Nome do Fornecedor"
