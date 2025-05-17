@@ -1,17 +1,17 @@
 import Header from "../components/Header";
 import NavBar from "../components/SideBar";
-import EditButton from "../components/EditButton";
+import EditButton from "../components/button/EditButton";
 import { ProductsFamiliesHeader } from "../constants/CrudViewHeader";
 import { axiosPrivate } from "../api/axiosConfig";
 import { useEffect, useState } from "react";
 import CrudContainer from "../components/CrudContainer";
-import AddButton from "../components/AddButton";
+import AddButton from "../components/button/AddButton";
 import CancelButton from "../components/CancelButton";
-import InputText from "../components/InputText";
-import FilterButton from "../components/FilterButton";
+import InputText from "../components/input/InputText";
+import FilterButton from "../components/button/FilterButton";
 import SearchBar from "../components/SearchBar";
-import Button from "../components/Button";
-import SecundaryButton from "../components/SecundaryButton";
+import Button from "../components/button/Button";
+import SecundaryButton from "../components/button/SecundaryButton";
 import type { ProductFamilyData } from "../interface/ProductFamilyData";
 
 const ProductsFamilies = () => {
@@ -25,12 +25,21 @@ const ProductsFamilies = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [posts, setPosts] = useState<ProductFamilyData[]>([]);
 
+  const initialProductFamilyData: ProductFamilyData = {
+    codigo: 0,
+    nome: "",
+  };
+
   const [productFamilyData, setProductFamilyData] = useState<ProductFamilyData>(
     {
       codigo: 0,
       nome: "",
     }
   );
+
+  const resetProductFamilyData = () => {
+    setProductFamilyData(initialProductFamilyData);
+  };
 
   const fetchAllPosts = async () => {
     setIsLoading(true);
@@ -148,7 +157,11 @@ const ProductsFamilies = () => {
                 <h1 className="font-poppins font-semibold text-xl text-main">
                   Famílias Produtos
                 </h1>
-                <AddButton onClick={() => setUserState("add")}>
+                <AddButton
+                  onClick={() => {
+                    setUserState("add"), resetProductFamilyData();
+                  }}
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="10"
@@ -217,7 +230,7 @@ const ProductsFamilies = () => {
                   </p>
                 </div>
               ) : posts.length ? (
-                <ul className="max-h-5/6 flex flex-col overflow-y-auto">
+                <ul className="h-full max-h-128 grow-0 flex flex-col overflow-y-auto">
                   {posts.map((ProductFamilyData, index) => (
                     <li
                       key={index}
@@ -264,7 +277,7 @@ const ProductsFamilies = () => {
                   </p>
                 </div>
               </div>
-              <div className="h-full max-h-156 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
+              <div className="h-full max-h-152 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
                 <InputText
                   label="Nome do Família"
                   placeholder="Digite o Nome do Família..."
@@ -315,7 +328,7 @@ const ProductsFamilies = () => {
                   </p>
                 </div>
               </div>
-              <div className="h-full max-h-156 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
+              <div className="h-full max-h-152 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
                 <InputText
                   label="Nome do Família"
                   placeholder="Digite o Nome do Família..."

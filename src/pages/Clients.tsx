@@ -1,23 +1,23 @@
 import Header from "../components/Header";
 import NavBar from "../components/SideBar";
-import EditButton from "../components/EditButton";
+import EditButton from "../components/button/EditButton";
 import { ClientsHeader } from "../constants/CrudViewHeader";
 import { axiosPrivate } from "../api/axiosConfig";
 import type { ClientData } from "../interface/ClientData";
 import { useEffect, useState } from "react";
 import CrudContainer from "../components/CrudContainer";
-import AddButton from "../components/AddButton";
+import AddButton from "../components/button/AddButton";
 import CancelButton from "../components/CancelButton";
-import InputText from "../components/InputText";
+import InputText from "../components/input/InputText";
 import Line from "../components/Line";
-import FilterButton from "../components/FilterButton";
-import InputSelect from "../components/InputSelect";
+import FilterButton from "../components/button/FilterButton";
+import InputSelect from "../components/input/InputSelect";
 import { TipoPessoa } from "../constants/TipoPessoa";
 import { UF } from "../constants/UF";
-import InputTelephone from "../components/InputTelephone";
+import InputTelephone from "../components/input/InputTelephone";
 import SearchBar from "../components/SearchBar";
-import Button from "../components/Button";
-import SecundaryButton from "../components/SecundaryButton";
+import Button from "../components/button/Button";
+import SecundaryButton from "../components/button/SecundaryButton";
 
 const Clients = () => {
   const [userState, setUserState] = useState<"view" | "add" | "edit">("view");
@@ -29,6 +29,30 @@ const Clients = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [posts, setPosts] = useState<ClientData[]>([]);
+
+  const initialClientData: ClientData = {
+    cpfOuCnpj: "",
+    tipoPessoa: "",
+    nomeOuRazaoSocial: "",
+    email: "",
+    endereco: {
+      cep: "",
+      logradouro: "",
+      numero: "",
+      complemento: "",
+      bairro: "",
+      cidade: "",
+      uf: "",
+      enderecoFormatado: "",
+    },
+    telefones: [
+      {
+        tipo: "",
+        ddd: 0,
+        numero: 0,
+      },
+    ],
+  };
 
   const [clientData, setClientData] = useState<ClientData>({
     cpfOuCnpj: "",
@@ -54,13 +78,17 @@ const Clients = () => {
     ],
   });
 
+  const resetClientData = () => {
+    setClientData(initialClientData);
+  };
+
   const fetchAllPosts = async () => {
     setIsLoading(true);
     try {
       const response = await axiosPrivate.get("/cliente");
       setPosts(response.data.data);
     } catch (error) {
-      console.error("Erro ao buscar todos os clientes:", error);
+      console.error("Erro ao buscar buscar clientes:", error);
     } finally {
       setIsLoading(false);
     }
@@ -106,6 +134,7 @@ const Clients = () => {
       const response = await axiosPrivate.post("/cliente", clientData);
       console.log("Cliente criado:", response.data);
       setUserState("view");
+      fetchAllPosts();
     } catch (error) {
       console.error("Erro ao adicionar cliente:", error);
     }
@@ -118,6 +147,7 @@ const Clients = () => {
       console.log("Dados sendo enviados no PUT:", clientData);
       await axiosPrivate.put(`/cliente/${postToEditId}`, clientData);
       setUserState("view");
+      fetchAllPosts();
     } catch (error) {
       console.error("Erro ao atualizar cliente:", error);
     }
@@ -129,6 +159,7 @@ const Clients = () => {
     try {
       await axiosPrivate.delete(`/cliente/${postToEditId}`);
       setUserState("view");
+      fetchAllPosts();
     } catch (error) {
       console.error("Erro ao apagar cliente:", error);
     }
@@ -145,7 +176,7 @@ const Clients = () => {
         });
         setPosts(response.data.data);
       } catch (error) {
-        console.error("Erro ao procurar clientes:", error);
+        console.error("Erro ao buscar clientes:", error);
       } finally {
         setIsLoading(false);
       }
@@ -170,7 +201,12 @@ const Clients = () => {
                 <h1 className="font-poppins font-semibold text-xl text-main">
                   Clientes
                 </h1>
-                <AddButton onClick={() => setUserState("add")}>
+                <AddButton
+                  onClick={() => {
+                    resetClientData();
+                    setUserState("add");
+                  }}
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="10"
@@ -245,7 +281,7 @@ const Clients = () => {
                   </p>
                 </div>
               ) : posts.length ? (
-                <ul className="max-h-5/6 flex flex-col overflow-y-auto">
+                <ul className="h-full max-h-128 grow-0 flex flex-col overflow-y-auto">
                   {posts.map((ClientData, index) => (
                     <li
                       key={index}
@@ -305,7 +341,7 @@ const Clients = () => {
                   </p>
                 </div>
               </div>
-              <div className="h-full max-h-156 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
+              <div className="h-full max-h-152 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
                 <div className="w-full flex flex-row gap-6">
                   <InputText
                     label="Nome do Cliente"
@@ -510,7 +546,7 @@ const Clients = () => {
                   </p>
                 </div>
               </div>
-              <div className="h-full max-h-156 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
+              <div className="h-full max-h-152 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
                 <div className="w-full flex flex-row gap-6">
                   <InputText
                     label="Nome do Cliente"

@@ -1,18 +1,18 @@
 import Header from "../components/Header";
 import NavBar from "../components/SideBar";
-import EditButton from "../components/EditButton";
+import EditButton from "../components/button/EditButton";
 import { axiosPrivate } from "../api/axiosConfig";
 import type { ProductData } from "../interface/ProductData";
 import { useEffect, useState } from "react";
 import CrudContainer from "../components/CrudContainer";
-import AddButton from "../components/AddButton";
+import AddButton from "../components/button/AddButton";
 import CancelButton from "../components/CancelButton";
-import InputText from "../components/InputText";
-import FilterButton from "../components/FilterButton";
+import InputText from "../components/input/InputText";
+import FilterButton from "../components/button/FilterButton";
 import SearchBar from "../components/SearchBar";
-import Button from "../components/Button";
-import SecundaryButton from "../components/SecundaryButton";
-import InputNumber from "../components/InputNumber";
+import Button from "../components/button/Button";
+import SecundaryButton from "../components/button/SecundaryButton";
+import InputNumber from "../components/input/InputNumber";
 import { ProductsHeader } from "../constants/CrudViewHeader";
 
 const Products = () => {
@@ -25,6 +25,40 @@ const Products = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [posts, setPosts] = useState<ProductData[]>([]);
+
+  const initialProductData: ProductData = {
+    codigo: 0,
+    familia: {
+      codigo: 0,
+      nome: "",
+    },
+    nome: "",
+    descricao: "",
+    preco: 0,
+    fornecedor: {
+      cpfOuCnpj: "",
+      tipoPessoa: "",
+      nomeOuRazaoSocial: "",
+      email: "",
+      endereco: {
+        cep: "",
+        logradouro: "",
+        numero: "",
+        complemento: "",
+        bairro: "",
+        cidade: "",
+        uf: "",
+        enderecoFormatado: "",
+      },
+      telefones: [
+        {
+          tipo: "",
+          ddd: 0,
+          numero: 0,
+        },
+      ],
+    },
+  };
 
   const [productData, setProductData] = useState<ProductData>({
     codigo: 0,
@@ -59,6 +93,10 @@ const Products = () => {
       ],
     },
   });
+
+  const resetProductData = () => {
+    setProductData(initialProductData);
+  };
 
   const fetchAllPosts = async () => {
     setIsLoading(true);
@@ -187,7 +225,11 @@ const Products = () => {
                 <h1 className="font-poppins font-semibold text-xl text-main">
                   Produtos
                 </h1>
-                <AddButton onClick={() => setUserState("add")}>
+                <AddButton
+                  onClick={() => {
+                    setUserState("add"), resetProductData();
+                  }}
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="10"
@@ -268,7 +310,7 @@ const Products = () => {
                   </p>
                 </div>
               ) : posts.length ? (
-                <ul className="max-h-5/6 flex flex-col overflow-y-auto">
+                <ul className="h-full max-h-128 grow-0 flex flex-col overflow-y-auto">
                   {posts.map((ProductData, index) => (
                     <li
                       key={index}
@@ -325,7 +367,7 @@ const Products = () => {
                   </p>
                 </div>
               </div>
-              <div className="h-full max-h-156 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
+              <div className="h-full max-h-152 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
                 <div className="w-full flex flex-row gap-6">
                   <InputText
                     label="Produto"
@@ -430,7 +472,7 @@ const Products = () => {
                   </p>
                 </div>
               </div>
-              <div className="h-full max-h-156 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
+              <div className="h-full max-h-152 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
                 <div className="w-full flex flex-row gap-6">
                   <InputText
                     label="Produto"

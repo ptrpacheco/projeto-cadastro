@@ -3,12 +3,12 @@ import NavBar from "../components/SideBar";
 import { axiosPrivate } from "../api/axiosConfig";
 import { useState } from "react";
 import CrudContainer from "../components/CrudContainer";
-import InputText from "../components/InputText";
-import Button from "../components/Button";
-import SecundaryButton from "../components/SecundaryButton";
-import InputPassword from "../components/InputPassword";
+import InputText from "../components/input/InputText";
+import Button from "../components/button/Button";
+import SecundaryButton from "../components/button/SecundaryButton";
+import InputPassword from "../components/input/InputPassword";
 import type { UserData } from "../interface/UserData";
-import InputSelect from "../components/InputSelect";
+import InputSelect from "../components/input/InputSelect";
 import { CategoriaUsuario } from "../constants/CategoriaUsuario";
 
 const Users = () => {
@@ -62,36 +62,36 @@ const Users = () => {
                 </p>
               </div>
             </div>
-            <div className="h-full max-h-156 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
+            <div className="h-full max-h-152 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
               <div className="w-full flex flex-row gap-6">
                 <InputText
-                label="Nome do Usuário"
-                placeholder="Digite o Nome do Usuário..."
-                value={userData.nomeUsuario}
-                onChange={(e) =>
-                  setUserData({
-                    ...userData,
-                    nomeUsuario: e.target.value,
-                  })
-                }
-              />
-              <InputSelect
-                    label="Categoria"
-                    value={userData.categoria}
-                    onChange={(e) =>
-                      setUserData({
-                        ...userData,
-                        categoria: e.target.value
-                      })
-                    }
-                  >
-                    <option value="">Selecione</option>
-                    {CategoriaUsuario.map((CategoriaUsuario, i) => (
-                      <option key={i} value={CategoriaUsuario.value}>
-                        {CategoriaUsuario.label}
-                      </option>
-                    ))}
-                  </InputSelect>
+                  label="Nome do Usuário"
+                  placeholder="Digite o Nome do Usuário..."
+                  value={userData.nomeUsuario}
+                  onChange={(e) =>
+                    setUserData({
+                      ...userData,
+                      nomeUsuario: e.target.value,
+                    })
+                  }
+                />
+                <InputSelect
+                  label="Categoria"
+                  value={userData.categoria}
+                  onChange={(e) =>
+                    setUserData({
+                      ...userData,
+                      categoria: e.target.value,
+                    })
+                  }
+                >
+                  <option value="">Selecione</option>
+                  {CategoriaUsuario.map((CategoriaUsuario, i) => (
+                    <option key={i} value={CategoriaUsuario.value}>
+                      {CategoriaUsuario.label}
+                    </option>
+                  ))}
+                </InputSelect>
               </div>
               <div className="w-full flex flex-row gap-6">
                 <InputText

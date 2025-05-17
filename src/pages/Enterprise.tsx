@@ -3,12 +3,12 @@ import NavBar from "../components/SideBar";
 import { axiosPrivate } from "../api/axiosConfig";
 import { useEffect, useState } from "react";
 import CrudContainer from "../components/CrudContainer";
-import InputText from "../components/InputText";
-import Button from "../components/Button";
+import InputText from "../components/input/InputText";
+import Button from "../components/button/Button";
 import type { EnterpriseData } from "../interface/EnterpriseData";
-import InputTelephone from "../components/InputTelephone";
+import InputTelephone from "../components/input/InputTelephone";
 import Line from "../components/Line";
-import InputSelect from "../components/InputSelect";
+import InputSelect from "../components/input/InputSelect";
 import { UF } from "../constants/UF";
 
 const Enterprise = () => {
@@ -73,7 +73,7 @@ const Enterprise = () => {
                 </p>
               </div>
             </div>
-            <div className="h-full max-h-156 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
+            <div className="h-full max-h-152 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
               <div className="w-full flex flex-row gap-6">
                 <InputText
                   label="Nome da Empresa"

@@ -1,24 +1,24 @@
 import Header from "../components/Header";
 import NavBar from "../components/SideBar";
-import EditButton from "../components/EditButton";
+import EditButton from "../components/button/EditButton";
 import { ServicesHeader } from "../constants/CrudViewHeader";
 import { axiosPrivate } from "../api/axiosConfig";
 import { useEffect, useState } from "react";
 import CrudContainer from "../components/CrudContainer";
-import AddButton from "../components/AddButton";
+import AddButton from "../components/button/AddButton";
 import CancelButton from "../components/CancelButton";
-import InputText from "../components/InputText";
-import FilterButton from "../components/FilterButton";
+import InputText from "../components/input/InputText";
+import FilterButton from "../components/button/FilterButton";
 import SearchBar from "../components/SearchBar";
-import Button from "../components/Button";
-import SecundaryButton from "../components/SecundaryButton";
+import Button from "../components/button/Button";
+import SecundaryButton from "../components/button/SecundaryButton";
 import type { ServiceData } from "../interface/ServiceData";
 import Line from "../components/Line";
-import InputProduct from "../components/InputProduct";
-import InputNumber from "../components/InputNumber";
-import InputSelect from "../components/InputSelect";
+import InputProduct from "../components/input/InputProduct";
+import InputNumber from "../components/input/InputNumber";
+import InputSelect from "../components/input/InputSelect";
 import { TipoDesconto } from "../constants/TipoDesconto";
-import PDFButton from "../components/PDFButton";
+import PDFButton from "../components/button/PDFButton";
 
 const Services = () => {
   const [userState, setUserState] = useState<"view" | "add" | "edit">("view");
@@ -30,6 +30,53 @@ const Services = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [posts, setPosts] = useState<ServiceData[]>([]);
+
+    const initialServiceData: ServiceData = {
+    codigo: 0,
+    cliente: {
+      cpfOuCnpj: "",
+      tipoPessoa: "",
+      nomeOuRazaoSocial: "",
+      email: "",
+      endereco: {
+        cep: "",
+        logradouro: "",
+        numero: "",
+        complemento: "",
+        bairro: "",
+        cidade: "",
+        uf: "",
+        enderecoFormatado: "",
+      },
+      telefones: [
+        {
+          tipo: "",
+          ddd: 0,
+          numero: 0,
+        },
+      ],
+    },
+    maoDeObra: {
+      descricao: "",
+      preco: 0,
+    },
+    itens: [
+      {
+        produtoId: 0,
+        quantidade: 0,
+        precoUnitario: 0,
+        precoTotalItem: 0,
+      },
+    ],
+    precoTotalProdutos: 0,
+    precoTotal: 0,
+    desconto: {
+      tipo: "",
+      valor: 0,
+    },
+    precoTotalComDesconto: 0,
+    dataCriacao: "",
+  };
 
   const [serviceData, setServiceData] = useState<ServiceData>({
     codigo: 0,
@@ -78,6 +125,10 @@ const Services = () => {
     dataCriacao: "",
   });
 
+  const resetServiceData = () => {
+    setServiceData(initialServiceData);
+  };
+
   const fetchAllPosts = async () => {
     setIsLoading(true);
     try {
@@ -102,24 +153,26 @@ const Services = () => {
   };
 
   const downloadPDF = async (codigoServico: number) => {
-  try {
-    const response = await axiosPrivate.get(`/servico-pdf/${codigoServico}`, {
-      responseType: "blob",
-    });
+    try {
+      const response = await axiosPrivate.get(`/servico-pdf/${codigoServico}`, {
+        responseType: "blob",
+      });
 
-    const fileURL = window.URL.createObjectURL(new Blob([response.data], { type: "application/pdf" }));
-    
-    const fileLink = document.createElement("a");
-    fileLink.href = fileURL;
-    fileLink.setAttribute("download", `servico-${codigoServico}.pdf`);
-    document.body.appendChild(fileLink);
-    fileLink.click();
+      const fileURL = window.URL.createObjectURL(
+        new Blob([response.data], { type: "application/pdf" })
+      );
 
-    fileLink.remove();
-  } catch (error) {
-    console.error("Erro ao gerar PDF:", error);
-  }
-};
+      const fileLink = document.createElement("a");
+      fileLink.href = fileURL;
+      fileLink.setAttribute("download", `servico-${codigoServico}.pdf`);
+      document.body.appendChild(fileLink);
+      fileLink.click();
+
+      fileLink.remove();
+    } catch (error) {
+      console.error("Erro ao gerar PDF:", error);
+    }
+  };
 
   const handleSearch = async () => {
     if (!searchTerm) return;
@@ -145,34 +198,34 @@ const Services = () => {
     }
   };
 
-const handleAddPost = async () => {
-  try {
-    const payload = {
-      ...serviceData,
-      cliente: serviceData.cliente.cpfOuCnpj
-    };
-    const response = await axiosPrivate.post("/servico", payload);
-    console.log("Serviço criado:", response.data);
-    setUserState("view");
-  } catch (error) {
-    console.error("Erro ao adicionar serviço:", error);
-  }
-};
+  const handleAddPost = async () => {
+    try {
+      const payload = {
+        ...serviceData,
+        cliente: serviceData.cliente.cpfOuCnpj,
+      };
+      const response = await axiosPrivate.post("/servico", payload);
+      console.log("Serviço criado:", response.data);
+      setUserState("view");
+    } catch (error) {
+      console.error("Erro ao adicionar serviço:", error);
+    }
+  };
 
-const handleUpdatePost = async () => {
-  if (!postToEditId) return;
+  const handleUpdatePost = async () => {
+    if (!postToEditId) return;
 
-  try {
-    const payload = {
-      ...serviceData,
-      cliente: serviceData.cliente.cpfOuCnpj
-    };
-    await axiosPrivate.put(`/servico/${postToEditId}`, payload);
-    setUserState("view");
-  } catch (error) {
-    console.error("Erro ao atualizar serviço:", error);
-  }
-};
+    try {
+      const payload = {
+        ...serviceData,
+        cliente: serviceData.cliente.cpfOuCnpj,
+      };
+      await axiosPrivate.put(`/servico/${postToEditId}`, payload);
+      setUserState("view");
+    } catch (error) {
+      console.error("Erro ao atualizar serviço:", error);
+    }
+  };
 
   const handleDeletePost = async () => {
     if (!postToEditId) return;
@@ -186,27 +239,27 @@ const handleUpdatePost = async () => {
   };
 
   useEffect(() => {
-  const precoTotalProdutos = serviceData.itens.reduce((total, item) => {
-    return total + (item.precoTotalItem || 0);
-  }, 0);
+    const precoTotalProdutos = serviceData.itens.reduce((total, item) => {
+      return total + (item.precoTotalItem || 0);
+    }, 0);
 
-  const precoTotal = precoTotalProdutos + (serviceData.maoDeObra?.preco || 0);
+    const precoTotal = precoTotalProdutos + (serviceData.maoDeObra?.preco || 0);
 
-  const descontoValor = serviceData.desconto?.valor || 0;
-  const precoTotalComDesconto =
-    serviceData.desconto?.tipo === "VALOR"
-      ? precoTotal - descontoValor
-      : serviceData.desconto?.tipo === "PORCENTAGEM"
-      ? precoTotal - precoTotal * (descontoValor / 100)
-      : precoTotal;
+    const descontoValor = serviceData.desconto?.valor || 0;
+    const precoTotalComDesconto =
+      serviceData.desconto?.tipo === "VALOR"
+        ? precoTotal - descontoValor
+        : serviceData.desconto?.tipo === "PORCENTAGEM"
+        ? precoTotal - precoTotal * (descontoValor / 100)
+        : precoTotal;
 
-  setServiceData((prev) => ({
-    ...prev,
-    precoTotalProdutos,
-    precoTotal,
-    precoTotalComDesconto,
-  }));
-}, [serviceData.itens, serviceData.maoDeObra.preco, serviceData.desconto]);
+    setServiceData((prev) => ({
+      ...prev,
+      precoTotalProdutos,
+      precoTotal,
+      precoTotalComDesconto,
+    }));
+  }, [serviceData.itens, serviceData.maoDeObra.preco, serviceData.desconto]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -244,7 +297,7 @@ const handleUpdatePost = async () => {
                 <h1 className="font-poppins font-semibold text-xl text-main">
                   Serviços
                 </h1>
-                <AddButton onClick={() => setUserState("add")}>
+                <AddButton onClick={() => {setUserState("add"), resetServiceData()}}>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="10"
@@ -313,7 +366,7 @@ const handleUpdatePost = async () => {
                   </p>
                 </div>
               ) : posts.length ? (
-                <ul className="max-h-5/6 flex flex-col overflow-y-auto">
+                <ul className="h-full max-h-128 grow-0 flex flex-col overflow-y-auto">
                   {posts.map((ServiceData, index) => (
                     <li
                       key={index}
@@ -340,7 +393,9 @@ const handleUpdatePost = async () => {
                         </span>
                       </div>
                       <div className="flex flex-row gap-1">
-                        <PDFButton onClick={() => downloadPDF(ServiceData.codigo)} />
+                        <PDFButton
+                          onClick={() => downloadPDF(ServiceData.codigo)}
+                        />
                         <EditButton
                           onClick={() => fetchPostById(ServiceData.codigo)}
                         />
@@ -371,7 +426,7 @@ const handleUpdatePost = async () => {
                   </p>
                 </div>
               </div>
-              <div className="h-full max-h-156 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
+              <div className="h-full max-h-152 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
                 <InputText
                   label="Cliente (CPF/CNPJ)"
                   placeholder="Digite o CPF/CNPJ do Cliente..."
@@ -417,7 +472,6 @@ const handleUpdatePost = async () => {
                           preco: parseFloat(e.target.value),
                         },
                       })
-        
                     }
                   />
                 </div>
@@ -426,8 +480,6 @@ const handleUpdatePost = async () => {
                   <Line />
                 </div>
                 <InputProduct
-                  label="Produtos"
-                  placeholder="Digite o Código do Produto..."
                   value={serviceData.itens}
                   onChange={(newItens) =>
                     setServiceData({ ...serviceData, itens: newItens })
@@ -530,7 +582,7 @@ const handleUpdatePost = async () => {
                   </p>
                 </div>
               </div>
-              <div className="h-full max-h-156 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
+              <div className="h-full max-h-152 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
                 <InputText
                   label="Cliente (CPF/CNPJ)"
                   placeholder="Digite o CPF/CNPJ do Cliente..."
@@ -584,8 +636,6 @@ const handleUpdatePost = async () => {
                   <Line />
                 </div>
                 <InputProduct
-                  label="Produtos"
-                  placeholder="Digite o Código do Produto..."
                   value={serviceData.itens}
                   onChange={(newItens) =>
                     setServiceData({ ...serviceData, itens: newItens })
