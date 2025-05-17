@@ -1,36 +1,58 @@
 import Header from "../components/Header";
 import NavBar from "../components/SideBar";
-import EditButton from "../components/EditButton";
+import EditButton from "../components/button/EditButton";
 import { ClientsHeader } from "../constants/CrudViewHeader";
 import { axiosPrivate } from "../api/axiosConfig";
 import type { SupplierData } from "../interface/SupplierData";
 import { useEffect, useState } from "react";
 import CrudContainer from "../components/CrudContainer";
-import AddButton from "../components/AddButton";
+import AddButton from "../components/button/AddButton";
 import CancelButton from "../components/CancelButton";
-import InputText from "../components/InputText";
+import InputText from "../components/input/InputText";
 import Line from "../components/Line";
-import FilterButton from "../components/FilterButton";
-import InputSelect from "../components/InputSelect";
+import FilterButton from "../components/button/FilterButton";
+import InputSelect from "../components/input/InputSelect";
 import { TipoPessoa } from "../constants/TipoPessoa";
 import { UF } from "../constants/UF";
-import InputTelephone from "../components/InputTelephone";
+import InputTelephone from "../components/input/InputTelephone";
 import SearchBar from "../components/SearchBar";
-import Button from "../components/Button";
-import SecundaryButton from "../components/SecundaryButton";
+import Button from "../components/button/Button";
+import SecundaryButton from "../components/button/SecundaryButton";
 
 const Suppliers = () => {
   const [userState, setUserState] = useState<"view" | "add" | "edit">("view");
 
-  const [postToEditId, setPostToEditId] = useState<string | null>(
-    null
-  );
+  const [postToEditId, setPostToEditId] = useState<string | null>(null);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState<"" | "nome/" | "email/">("");
 
   const [isLoading, setIsLoading] = useState(false);
   const [posts, setPosts] = useState<SupplierData[]>([]);
+
+  const initialSupplierData: SupplierData = {
+    cpfOuCnpj: "",
+    tipoPessoa: "",
+    nomeOuRazaoSocial: "",
+    email: "",
+    endereco: {
+      cep: "",
+      logradouro: "",
+      numero: "",
+      complemento: "",
+      bairro: "",
+      cidade: "",
+      uf: "",
+      enderecoFormatado: "",
+    },
+    telefones: [
+      {
+        tipo: "",
+        ddd: 0,
+        numero: 0,
+      },
+    ],
+  };
 
   const [supplierData, setSupplierData] = useState<SupplierData>({
     cpfOuCnpj: "",
@@ -55,6 +77,10 @@ const Suppliers = () => {
       },
     ],
   });
+
+  const resetSupplierData = () => {
+    setSupplierData(initialSupplierData);
+  };
 
   const fetchAllPosts = async () => {
     setIsLoading(true);
@@ -172,7 +198,11 @@ const Suppliers = () => {
                 <h1 className="font-poppins font-semibold text-xl text-main">
                   Fornecedores
                 </h1>
-                <AddButton onClick={() => setUserState("add")}>
+                <AddButton
+                  onClick={() => {
+                    setUserState("add"), resetSupplierData();
+                  }}
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="10"
@@ -247,7 +277,7 @@ const Suppliers = () => {
                   </p>
                 </div>
               ) : posts.length ? (
-                <ul className="max-h-5/6 flex flex-col overflow-y-auto">
+                <ul className="h-full max-h-128 grow-0 flex flex-col overflow-y-auto">
                   {posts.map((SupplierData, index) => (
                     <li
                       key={index}
@@ -278,9 +308,7 @@ const Suppliers = () => {
                       </div>
                       <div className="flex flex-row gap-1">
                         <EditButton
-                          onClick={() =>
-                            fetchPostsById(SupplierData.cpfOuCnpj)
-                          }
+                          onClick={() => fetchPostsById(SupplierData.cpfOuCnpj)}
                         />
                       </div>
                     </li>
@@ -309,7 +337,7 @@ const Suppliers = () => {
                   </p>
                 </div>
               </div>
-              <div className="h-full max-h-156 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
+              <div className="h-full max-h-152 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
                 <div className="w-full flex flex-row gap-6">
                   <InputText
                     label="Nome do Fornecedor"
@@ -517,7 +545,7 @@ const Suppliers = () => {
                   </p>
                 </div>
               </div>
-              <div className="h-full max-h-156 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
+              <div className="h-full max-h-152 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
                 <div className="w-full flex flex-row gap-6">
                   <InputText
                     label="Nome do Fornecedor"
