@@ -141,6 +141,7 @@ const Services = () => {
       try {
         const response = await axiosPrivate.get("/cliente");
         setClientList(response.data.data || []);
+        setRequestError(null);
       } catch (error) {
         setRequestError(error);
       }
@@ -177,6 +178,7 @@ const Services = () => {
     try {
       const response = await axiosPrivate.get("/servico");
       setPosts(response.data.data);
+      setRequestError(null);
     } catch (error) {
       setRequestError(error);
     } finally {
@@ -190,6 +192,7 @@ const Services = () => {
       setServiceData(response.data.data);
       setPostToEditId(codigo);
       setUserState("edit");
+      setRequestError(null);
     } catch (error) {
       setRequestError(error);
     }
@@ -226,6 +229,7 @@ const Services = () => {
         `/servico/${filterType.toLowerCase()}${searchTerm}`
       );
       const data = response.data.data;
+      setRequestError(null);
       if (Array.isArray(data)) {
         setPosts(data);
       } else if (data) {

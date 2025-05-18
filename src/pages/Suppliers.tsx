@@ -92,6 +92,7 @@ const Suppliers = () => {
     try {
       const response = await axiosPrivate.get("/fornecedor");
       setPosts(response.data.data);
+      setRequestError(null);
     } catch (error) {
       setRequestError(error);
     } finally {
@@ -105,6 +106,7 @@ const Suppliers = () => {
       setSupplierData(response.data.data);
       setPostToEditId(cpfOuCnpj);
       setUserState("edit");
+      setRequestError(null);
     } catch (error) {
       setRequestError(error);
     }
@@ -119,6 +121,7 @@ const Suppliers = () => {
         `/fornecedor/${filterType.toLowerCase()}${searchTerm}`
       );
       const data = response.data.data;
+      setRequestError(null);
       if (Array.isArray(data)) {
         setPosts(data);
       } else if (data) {

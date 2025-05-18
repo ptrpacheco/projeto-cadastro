@@ -31,6 +31,7 @@ const Users = () => {
       console.log("Usuário criado:", response.data);
       setUserData({ nomeUsuario: "", email: "", senha: "", categoria: "" });
       setFormError("");
+      setRequestError(null);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const apiMessage = error.response?.data?.message;

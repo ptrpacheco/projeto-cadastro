@@ -51,6 +51,7 @@ const ProductsFamilies = () => {
     try {
       const response = await axiosPrivate.get("/familia");
       setPosts(response.data.data);
+      setRequestError(null);
     } catch (error) {
       setRequestError(error);
     } finally {
@@ -64,6 +65,7 @@ const ProductsFamilies = () => {
       setProductFamilyData(response.data.data);
       setPostToEditId(codigo);
       setUserState("edit");
+      setRequestError(null);
     } catch (error) {
       setRequestError(error);
     }
@@ -78,6 +80,7 @@ const ProductsFamilies = () => {
         `/familia/${filterType.toLowerCase()}${searchTerm}`
       );
       const data = response.data.data;
+      setRequestError(null);
       if (Array.isArray(data)) {
         setPosts(data);
       } else if (data) {

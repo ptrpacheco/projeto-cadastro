@@ -49,7 +49,7 @@ const InputTelephone = ({ label, placeholder, value, onChange }: InputTelephoneP
               onChange={(e) => handleChange(index, "tipo", e.target.value)}
               className="w-28 h-10 p-2 border border-gray rounded-lg focus:outline-0 focus:border-main"
             >
-              <option value="">Selecione</option>
+              <option>Selecione</option>
               <option value="CELULAR">Celular</option>
               <option value="FIXO">Fixo</option>
             </select>

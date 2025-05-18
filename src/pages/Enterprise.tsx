@@ -60,6 +60,7 @@ const Enterprise = () => {
       try {
         const response = await axiosPrivate.get("/empresa/8");
         setEnterpriseData(response.data.data);
+        setRequestError(null);
     } catch (error) {
       setRequestError(error);
     }

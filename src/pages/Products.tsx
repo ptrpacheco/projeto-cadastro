@@ -116,6 +116,7 @@ const Products = () => {
       try {
         const response = await axiosPrivate.get("/familia");
         setProductFamilyList(response.data.data || []);
+        setRequestError(null);
       } catch (error) {
         setRequestError(error);
       }
@@ -151,6 +152,7 @@ const Products = () => {
       try {
         const response = await axiosPrivate.get("/fornecedor");
         setSupplierList(response.data.data || []);
+        setRequestError(null);
       } catch (error) {
         setRequestError(error);
       } finally {
@@ -191,6 +193,7 @@ const Products = () => {
     try {
       const response = await axiosPrivate.get("/produto");
       setPosts(response.data.data);
+      setRequestError(null);
     } catch (error) {
       setRequestError(error);
     } finally {
@@ -218,6 +221,7 @@ const Products = () => {
         `/produto/${filterType.toLowerCase()}${searchTerm}`
       );
       const data = response.data.data;
+      setRequestError(null);
       if (Array.isArray(data)) {
         setPosts(data);
       } else if (data) {
