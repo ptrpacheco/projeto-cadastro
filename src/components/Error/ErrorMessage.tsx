@@ -15,9 +15,9 @@ const ErrorMessage = ({ message }: ErrorMessageProps) => {
         <path
           d="M9.33331 6.13331V9.33331M9.33331 12.5333H9.34131M17.3333 9.33331C17.3333 13.7516 13.7516 17.3333 9.33331 17.3333C4.91503 17.3333 1.33331 13.7516 1.33331 9.33331C1.33331 4.91503 4.91503 1.33331 9.33331 1.33331C13.7516 1.33331 17.3333 4.91503 17.3333 9.33331Z"
           stroke="#C10007"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeWidth="2"
+          strokeLinecap="round"
+          stroke-Linejoin="round"
         />
       </svg>
 

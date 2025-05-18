@@ -88,9 +88,9 @@ const InputTelephone = ({ label, placeholder, value, onChange }: InputTelephoneP
                   <path
                     d="M5 1V9M1 5H9"
                     stroke="#c3c3c3"
-                    stroke-width="1"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                    strokeWidth="1"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   />
                 </svg>
               </button>
@@ -110,9 +110,9 @@ const InputTelephone = ({ label, placeholder, value, onChange }: InputTelephoneP
                   <path
                     d="M1 1H13"
                     stroke="#C3C3C3"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   />
                 </svg>
               </button>

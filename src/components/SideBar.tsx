@@ -6,11 +6,11 @@ const SideBar = () => {
   return (
     <nav className="w-72 flex flex-col justify-between border-r border-gray">
       <ul className="font-poppins text-md">
-        {Navigation.map((item, id) => {
+        {Navigation.map((item, index) => {
           return (
             <Link to={item.path}>
               <li
-                key={id}
+                key={index}
                 className="w-full flex flex-row items-center px-8 py-4 bg-white border-b border-gray cursor-pointer hover:bg-main hover:font-semibold"
               >
                 <span>{item.title}</span>
@@ -20,11 +20,11 @@ const SideBar = () => {
         })}
       </ul>
       <ul className="font-poppins text-md">
-        {NavigationBottom.map((item, id) => {
+        {NavigationBottom.map((item, index) => {
           return (
             <Link to={item.path}>
               <li
-                key={id}
+                key={index}
                 className="w-full flex flex-row items-center px-8 py-4 bg-white border-t border-gray cursor-pointer hover:bg-main hover:font-semibold"
               >
                 <span>{item.title}</span>

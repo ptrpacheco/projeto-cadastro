@@ -18,8 +18,8 @@ const CancelButton = ({ onClick }: CancelButtonProps) => {
         <path
           d="M9 5H1M1 5L5 9M1 5L5 1"
           stroke="#C3C3C3"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
       </svg>
     </button>
