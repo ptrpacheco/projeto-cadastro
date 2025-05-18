@@ -249,6 +249,7 @@ const Products = () => {
       console.log("Produto criado:", response.data);
       setUserState("view");
       fetchAllPosts();
+      setFormError("");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const apiMessage = error.response?.data?.message;
@@ -273,6 +274,7 @@ const Products = () => {
       await axiosPrivate.put(`/produto/${postToEditId}`, payload);
       setUserState("view");
       fetchAllPosts();
+      setFormError("");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const apiMessage = error.response?.data?.message;
@@ -291,6 +293,7 @@ const Products = () => {
       await axiosPrivate.delete(`/produto/${postToEditId}`);
       setUserState("view");
       fetchAllPosts();
+      setFormError("");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const apiMessage = error.response?.data?.message;

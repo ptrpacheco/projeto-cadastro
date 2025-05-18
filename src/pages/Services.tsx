@@ -265,6 +265,7 @@ const Services = () => {
       console.log("Serviço criado:", response.data);
       setUserState("view");
       fetchAllPosts();
+      setFormError("");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const apiMessage = error.response?.data?.message;
@@ -284,6 +285,7 @@ const Services = () => {
       await axiosPrivate.put(`/servico/${postToEditId}`, payload);
       setUserState("view");
       fetchAllPosts();
+      setFormError("");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const apiMessage = error.response?.data?.message;
@@ -302,6 +304,7 @@ const Services = () => {
       await axiosPrivate.delete(`/servico/${postToEditId}`);
       setUserState("view");
       fetchAllPosts();
+      setFormError("");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const apiMessage = error.response?.data?.message;

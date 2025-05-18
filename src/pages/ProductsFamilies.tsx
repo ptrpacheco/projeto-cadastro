@@ -102,6 +102,7 @@ const ProductsFamilies = () => {
       console.log("Família criada:", response.data);
       setUserState("view");
       fetchAllPosts();
+      setFormError("");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const apiMessage = error.response?.data?.message;
@@ -121,6 +122,7 @@ const ProductsFamilies = () => {
       await axiosPrivate.put(`/familia/${postToEditId}`, productFamilyData);
       setUserState("view");
       fetchAllPosts();
+      setFormError("");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const apiMessage = error.response?.data?.message;
@@ -139,6 +141,7 @@ const ProductsFamilies = () => {
       await axiosPrivate.delete(`/familia/${postToEditId}`);
       setUserState("view");
       fetchAllPosts();
+      setFormError("");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const apiMessage = error.response?.data?.message;

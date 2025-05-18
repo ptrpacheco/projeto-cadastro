@@ -143,6 +143,7 @@ const Suppliers = () => {
       console.log("Fornecedor criado:", response.data);
       setUserState("view");
       fetchAllPosts();
+      setFormError("");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const apiMessage = error.response?.data?.message;
@@ -162,6 +163,7 @@ const Suppliers = () => {
       await axiosPrivate.put(`/fornecedor/${postToEditId}`, supplierData);
       setUserState("view");
       fetchAllPosts();
+      setFormError("");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const apiMessage = error.response?.data?.message;
@@ -180,6 +182,7 @@ const Suppliers = () => {
       await axiosPrivate.delete(`/fornecedor/${postToEditId}`);
       setUserState("view");
       fetchAllPosts();
+      setFormError("");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const apiMessage = error.response?.data?.message;

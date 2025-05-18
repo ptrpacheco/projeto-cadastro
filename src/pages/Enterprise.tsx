@@ -44,6 +44,7 @@ const Enterprise = () => {
     try {
       console.log("Dados sendo enviados no PUT:", enterpriseData);
       await axiosPrivate.put(`/empresa/8`, enterpriseData);
+      setFormError("");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const apiMessage = error.response?.data?.message;
