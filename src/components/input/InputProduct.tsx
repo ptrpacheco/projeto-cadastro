@@ -7,6 +7,7 @@ import type { ProductData } from "../../interface/ProductData";
 
 interface Product {
   produtoId: number;
+  produto?: ProductData;
   quantidade: number;
   precoUnitario: number;
   precoTotalItem: number;
@@ -37,32 +38,25 @@ const InputProduct = ({ value, onChange }: InputProductProps) => {
     fetchProducts();
   }, []);
 
-  const getProductName = (produtoId: number) => {
-    if (!produtoId) return "Selecione um produto";
-    const product = productList.find((p) => p.codigo === produtoId);
-    return product?.nome || "Produto não encontrado";
-  };
-
-  const handleSelectProduct = async (produtoId: number) => {
+  const handleSelectProduct = (produtoId: number) => {
     if (selectedIndex === null) return;
+    const sel = productList.find((p) => p.codigo === produtoId);
+    if (!sel) return;
 
-    const selectedProduct = productList.find((p) => p.codigo === produtoId);
-    if (!selectedProduct) return;
-
-    const updated = products.map((product, i) => {
+    const updated = products.map((prod, i) => {
       if (i === selectedIndex) {
-        const precoUnitario = selectedProduct.preco || 0;
-        const quantidade = product.quantidade || 1;
+        const quantidade = prod.quantidade || 1;
+        const precoUnitario = sel.preco || 0;
         return {
-          ...product,
-          produtoId: produtoId,
+          produtoId,
+          produto: sel,
+          quantidade,
           precoUnitario,
           precoTotalItem: quantidade * precoUnitario,
         };
       }
-      return product;
+      return prod;
     });
-
     setProducts(updated);
     setOpen(false);
   };
@@ -127,7 +121,7 @@ const InputProduct = ({ value, onChange }: InputProductProps) => {
                     setOpen(true);
                   }}
                 >
-                  {getProductName(product.produtoId)}
+                  {product.produto?.nome ?? "Selecione um produto"}
                 </ModalButton>
               </div>
               <div className="flex flex-col gap-1">

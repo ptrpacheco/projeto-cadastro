@@ -241,12 +241,22 @@ const Services = () => {
     }
   };
 
+  const preparePayload = (serviceData: ServiceData) => {
+    return {
+      ...serviceData,
+      cliente: serviceData.cliente.cpfOuCnpj,
+      itens: serviceData.itens.map((item) => ({
+        produtoId: item.produtoId,
+        quantidade: item.quantidade,
+        precoUnitario: item.precoUnitario,
+        precoTotalItem: item.precoTotalItem,
+      })),
+    };
+  };
+
   const handleAddPost = async () => {
     try {
-      const payload = {
-        ...serviceData,
-        cliente: serviceData.cliente.cpfOuCnpj,
-      };
+      const payload = preparePayload(serviceData);
       const response = await axiosPrivate.post("/servico", payload);
       console.log("Serviço criado:", response.data);
       setUserState("view");
@@ -266,10 +276,7 @@ const Services = () => {
     if (!postToEditId) return;
 
     try {
-      const payload = {
-        ...serviceData,
-        cliente: serviceData.cliente.cpfOuCnpj,
-      };
+      const payload = preparePayload(serviceData);
       await axiosPrivate.put(`/servico/${postToEditId}`, payload);
       setUserState("view");
       fetchAllPosts();
