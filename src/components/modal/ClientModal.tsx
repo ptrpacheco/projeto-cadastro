@@ -88,7 +88,6 @@ const ClientModal = ({ open, onClose, onSelect }: ClientModalProps) => {
               />
             )}
           </div>
-          <div className="flex flex-row items-center gap-2">
             <SearchBar
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -98,7 +97,6 @@ const ClientModal = ({ open, onClose, onSelect }: ClientModalProps) => {
                 fetchAllPosts();
               }}
             />
-          </div>
         </div>
         {isLoading ? (
           <div className="w-full py-10 flex items-center justify-center">
@@ -113,7 +111,7 @@ const ClientModal = ({ open, onClose, onSelect }: ClientModalProps) => {
                 className="w-full flex flex-row items-center justify-between p-4 border-b border-gray duration-200 cursor-pointer hover:bg-background"
               >
                 <div className="w-full flex flex-row justify-between">
-                  <span className="text-sm truncate">
+                  <span className="font-semibold text-sm truncate">
                     {c.nomeOuRazaoSocial}
                   </span>
                   <span className="text-sm truncate">{c.cpfOuCnpj}</span>

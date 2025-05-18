@@ -88,17 +88,15 @@ const SupplierModal = ({ open, onClose, onSelect }: SupplierModalProps) => {
               />
             )}
           </div>
-          <div className="flex flex-row items-center gap-2">
-            <SearchBar
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onSearch={handleSearch}
-              onClear={() => {
-                setSearchTerm("");
-                fetchAllPosts();
-              }}
-            />
-          </div>
+          <SearchBar
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onSearch={handleSearch}
+            onClear={() => {
+              setSearchTerm("");
+              fetchAllPosts();
+            }}
+          />
         </div>
         {isLoading ? (
           <div className="w-full py-10 flex items-center justify-center">
@@ -113,7 +111,7 @@ const SupplierModal = ({ open, onClose, onSelect }: SupplierModalProps) => {
                 className="w-full flex flex-row items-center justify-between p-4 border-b border-gray duration-200 cursor-pointer hover:bg-background"
               >
                 <div className="w-full flex flex-row justify-between">
-                  <span className="text-sm truncate">
+                  <span className="text-sm truncate font-semibold">
                     {s.nomeOuRazaoSocial}
                   </span>
                   <span className="text-sm truncate">{s.cpfOuCnpj}</span>

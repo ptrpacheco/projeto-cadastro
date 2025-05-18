@@ -88,7 +88,6 @@ const ProductModal = ({ open, onClose, onSelect }: ProductModalProps) => {
               />
             )}
           </div>
-          <div className="flex flex-row items-center gap-2">
             <SearchBar
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -98,7 +97,6 @@ const ProductModal = ({ open, onClose, onSelect }: ProductModalProps) => {
                 fetchAllPosts();
               }}
             />
-          </div>
         </div>
         {isLoading ? (
           <div className="w-full py-10 flex items-center justify-center">
@@ -113,8 +111,8 @@ const ProductModal = ({ open, onClose, onSelect }: ProductModalProps) => {
                 className="w-full flex flex-row items-center justify-between p-4 border-b border-gray duration-200 cursor-pointer hover:bg-background"
               >
                 <div className="w-full flex flex-row justify-between">
-                  <span className="text-sm truncate">{f.nome}</span>
-                  <span className="text-sm truncate">{f.familia.codigo}</span>
+                  <span className="text-sm truncate font-semibold">{f.nome}</span>
+                  <span className="text-sm truncate">{f.familia.nome}</span>
                 </div>
               </li>
             ))}
