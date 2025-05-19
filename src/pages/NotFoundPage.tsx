@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { LogoBlackHorizontal } from "../assets";
-import Button from "../components/buttonTemp/Button";
+import Button from "../components/Button/Button";
 
 const NotFoundPage = () => {
   return (

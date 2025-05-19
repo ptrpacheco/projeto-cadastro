@@ -1,39 +1,39 @@
 import { useEffect, useState } from "react";
 import { axiosPrivate } from "../../api/axiosConfig";
-import CancelButton from "../buttonTemp/CancelButton";
-import type { ClientData } from "../../interface/ClientData";
+import CancelButton from "../Button/CancelButton";
+import type { SupplierData } from "../../interface/SupplierData";
 import SearchBar from "../SearchBar";
 import RequestError from "../Error/RequestError";
 
-interface ClientModalProps {
+interface SupplierModalProps {
   open: boolean;
   onSelect: (cpfOuCnpj: string) => void;
   onClose: () => void;
 }
 
-const ClientModal = ({ open, onClose, onSelect }: ClientModalProps) => {
+const SupplierModal = ({ open, onClose, onSelect }: SupplierModalProps) => {
   const [searchTerm, setSearchTerm] = useState("");
-
   const [isLoading, setIsLoading] = useState(false);
   const [requestError, setRequestError] = useState<unknown | null>(null);
-  const [clientList, setClientList] = useState<ClientData[]>([]);
+
+  const [supplierList, setSupplierList] = useState<SupplierData[]>([]);
 
   const handleSearch = async () => {
     try {
       setIsLoading(true);
-      const response = await axiosPrivate.get(`/cliente/nome/${searchTerm}`);
+      const response = await axiosPrivate.get(`/fornecedor/nome/${searchTerm}`);
       const data = response.data.data;
       setRequestError(null);
       if (Array.isArray(data)) {
-        setClientList(data);
+        setSupplierList(data);
       } else if (data) {
-        setClientList([data]);
+        setSupplierList([data]);
       } else {
-        setClientList([]);
+        setSupplierList([]);
       }
     } catch (error) {
       setRequestError(error);
-      setClientList([]);
+      setSupplierList([]);
     } finally {
       setIsLoading(false);
     }
@@ -42,8 +42,8 @@ const ClientModal = ({ open, onClose, onSelect }: ClientModalProps) => {
   const fetchAllPosts = async () => {
     setIsLoading(true);
     try {
-      const response = await axiosPrivate.get("/cliente");
-      setClientList(response.data.data);
+      const response = await axiosPrivate.get("/fornecedor");
+      setSupplierList(response.data.data);
       setRequestError(null);
     } catch (error) {
       setRequestError(error);
@@ -55,10 +55,10 @@ const ClientModal = ({ open, onClose, onSelect }: ClientModalProps) => {
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        const response = await axiosPrivate.get("/cliente");
-        setClientList(response.data.data);
+        const response = await axiosPrivate.get("/fornecedor");
+        setSupplierList(response.data.data);
       } catch (error) {
-        console.error("Erro ao buscar lista de clientes:", error);
+        console.error("Erro ao buscar lista de fornecedores:", error);
       }
     };
     fetchClients();
@@ -79,12 +79,12 @@ const ClientModal = ({ open, onClose, onSelect }: ClientModalProps) => {
           <div className="flex flex-row items-center gap-2">
             <CancelButton onClick={onClose} />
             <h1 className="font-poppins font-semibold text-xl text-main">
-              Selecionar Cliente
+              Selecionar Fornecedor
             </h1>
             {requestError instanceof Error && (
               <RequestError
                 error={requestError}
-                customMessage="Erro ao carregar os clientes."
+                customMessage="Erro ao carregar os fornecedores."
               />
             )}
           </div>
@@ -102,19 +102,19 @@ const ClientModal = ({ open, onClose, onSelect }: ClientModalProps) => {
           <div className="w-full py-10 flex items-center justify-center">
             <p className="text-sm font-poppins text-gray">Carregando...</p>
           </div>
-        ) : clientList.length ? (
+        ) : supplierList.length ? (
           <ul className="h-full max-h-128 grow-0 flex flex-col overflow-y-auto">
-            {clientList.map((c, index) => (
+            {supplierList.map((s, index) => (
               <li
                 key={index}
-                onClick={() => onSelect(c.cpfOuCnpj)}
+                onClick={() => onSelect(s.cpfOuCnpj)}
                 className="w-full flex flex-row items-center justify-between p-4 border-b border-gray duration-200 cursor-pointer hover:bg-background"
               >
                 <div className="w-full flex flex-row justify-between">
-                  <span className="font-semibold text-sm truncate">
-                    {c.nomeOuRazaoSocial}
+                  <span className="text-sm truncate font-semibold">
+                    {s.nomeOuRazaoSocial}
                   </span>
-                  <span className="text-sm truncate">{c.cpfOuCnpj}</span>
+                  <span className="text-sm truncate">{s.cpfOuCnpj}</span>
                 </div>
               </li>
             ))}
@@ -131,4 +131,4 @@ const ClientModal = ({ open, onClose, onSelect }: ClientModalProps) => {
   );
 };
 
-export default ClientModal;
+export default SupplierModal;

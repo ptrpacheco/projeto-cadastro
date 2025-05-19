@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { axiosPrivate } from "../../api/axiosConfig";
-import CancelButton from "../buttonTemp/CancelButton";
+import CancelButton from "../Button/CancelButton";
 import type { ProductFamilyData } from "../../interface/ProductFamilyData";
 import SearchBar from "../SearchBar";
 import RequestError from "../Error/RequestError";

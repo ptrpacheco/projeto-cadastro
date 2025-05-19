@@ -5,7 +5,7 @@ import { LogoBlackHorizontal } from "./assets";
 import Line from "./components/Line";
 import InputText from "./components/inputTemp/InputText";
 import InputPassword from "./components/inputTemp/InputPassword";
-import Button from "./components/buttonTemp/Button";
+import Button from "./components/Button/Button";
 import ErrorMessage from "./components/Error/ErrorMessage";
 
 function App() {
