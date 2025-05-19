@@ -191,7 +191,6 @@ const fetchPostById = async (codigo: number) => {
     const response = await axiosPrivate.get(`/servico/${codigo}`);
     const data = response.data.data;
     
-    // Converter valores numéricos e garantir produtoId
     const processedData = {
       ...data,
       precoTotal: typeof data.precoTotal === 'string' 
@@ -480,7 +479,7 @@ const preparePayload = (serviceData: ServiceData) => {
                   </div>
                 </div>
 
-                <ul className="w-full p-4 flex flex-row bg-background border-b border-gray">
+                <ul className="w-full p-4 flex flex-row gap-2 bg-background border-b border-gray">
                   {ServicesHeader.map((item, index) => {
                     return (
                       <li
@@ -508,7 +507,7 @@ const preparePayload = (serviceData: ServiceData) => {
                         key={index}
                         className="w-full flex flex-row items-center justify-between p-4 border-b border-gray"
                       >
-                        <div className="w-full flex flex-row">
+                        <div className="w-full flex flex-row gap-2">
                           <span className="text-sm basis-24 truncate">
                             {ServiceData.codigo}
                           </span>
