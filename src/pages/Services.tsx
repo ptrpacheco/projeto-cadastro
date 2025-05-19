@@ -602,7 +602,7 @@ const Services = () => {
                     />
                     <InputNumber
                       label="Valor Total do Serviço"
-                      placeholder="Digite o Valor Total do Serviço..."
+                      placeholder="Digite o Valor Total..."
                       value={serviceData.precoTotal}
                       readOnly={true}
                     />
