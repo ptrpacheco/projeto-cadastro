@@ -21,7 +21,7 @@ const SupplierModal = ({ open, onClose, onSelect }: SupplierModalProps) => {
   const handleSearch = async () => {
     try {
       setIsLoading(true);
-      const response = await axiosPrivate.get(`/supplier/nome/${searchTerm}`);
+      const response = await axiosPrivate.get(`/fornecedor/nome/${searchTerm}`);
       const data = response.data.data;
       setRequestError(null);
       if (Array.isArray(data)) {

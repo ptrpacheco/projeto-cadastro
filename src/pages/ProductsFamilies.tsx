@@ -182,7 +182,7 @@ const ProductsFamilies = () => {
   return (
     <div className="w-screen h-screen flex flex-col items-center justify-center overflow-hidden">
       <Header />
-      <div className="size-full flex flex-row">
+      <div className="size-full flex flex-1 flex-row overflow-hidden">
         <NavBar />
         <CrudContainer>
           {userState === "view" && (
@@ -272,7 +272,7 @@ const ProductsFamilies = () => {
                   </p>
                 </div>
               ) : posts.length ? (
-                <ul className="h-full max-h-128 grow-0 flex flex-col overflow-y-auto">
+                <ul className="flex-1 overflow-y-auto flex flex-col">
                   {posts.map((ProductFamilyData, index) => (
                     <li
                       key={index}
@@ -323,7 +323,7 @@ const ProductsFamilies = () => {
                   </p>
                 </div>
               </div>
-              <div className="h-full max-h-152 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
+              <div className="flex-1 overflow-y-auto flex flex-col p-4 gap-4">
                 {requestError instanceof Error && (
                   <RequestError
                     error={requestError}
@@ -385,7 +385,7 @@ const ProductsFamilies = () => {
                   </p>
                 </div>
               </div>
-              <div className="h-full max-h-152 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
+              <div className="flex-1 overflow-y-auto flex flex-col p-4 gap-4">
                 {requestError instanceof Error && (
                   <RequestError
                     error={requestError}

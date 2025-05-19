@@ -73,7 +73,7 @@ const Enterprise = () => {
   return (
     <div className="w-screen h-screen flex flex-col items-center justify-center overflow-hidden">
       <Header />
-      <div className="size-full flex flex-row">
+      <div className="size-full flex flex-1 flex-row overflow-hidden">
         <NavBar />
         <CrudContainer>
           <>
@@ -87,7 +87,7 @@ const Enterprise = () => {
                 </p>
               </div>
             </div>
-            <div className="h-full max-h-152 grow-0 flex flex-col gap-4 p-4 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto flex flex-col p-4 gap-4">
               {requestError instanceof Error && (
                   <RequestError
                     error={requestError}
