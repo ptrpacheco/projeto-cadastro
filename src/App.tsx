@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { LoginService } from "./service/LoginService";
 import { LogoBlackHorizontal } from "./assets";
 import Line from "./components/Line";
-import InputText from "./components/Input/InputText";
-import InputPassword from "./components/Input/InputPassword";
-import Button from "./components/Button/Button";
+import InputText from "./components/inputTemp/InputText";
+import InputPassword from "./components/inputTemp/InputPassword";
+import Button from "./components/buttonTemp/Button";
 import ErrorMessage from "./components/Error/ErrorMessage";
 
 function App() {

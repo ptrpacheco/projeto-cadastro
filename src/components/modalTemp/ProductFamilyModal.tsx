@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { axiosPrivate } from "../../api/axiosConfig";
-import CancelButton from "../Button/CancelButton";
+import CancelButton from "../buttonTemp/CancelButton";
 import type { ProductFamilyData } from "../../interface/ProductFamilyData";
 import SearchBar from "../SearchBar";
 import RequestError from "../Error/RequestError";
@@ -117,7 +117,9 @@ const ProductFamilyModal = ({
                 className="w-full flex flex-row items-center justify-between p-4 border-b border-gray duration-200 cursor-pointer hover:bg-background"
               >
                 <div className="w-full flex flex-row justify-between">
-                  <span className="text-sm truncate font-semibold">{f.nome}</span>
+                  <span className="text-sm truncate font-semibold">
+                    {f.nome}
+                  </span>
                 </div>
               </li>
             ))}

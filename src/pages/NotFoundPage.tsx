@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { LogoBlackHorizontal } from "../assets";
-import Button from "../components/Button/Button";
+import Button from "../components/buttonTemp/Button";
 
 const NotFoundPage = () => {
   return (
@@ -25,9 +25,7 @@ const NotFoundPage = () => {
           </div>
           <div className="w-full h-[1px] bg-gray rounded-full"></div>
           <Link to="/">
-            <Button>
-              Voltar à Tela Inicial
-            </Button>
+            <Button>Voltar à Tela Inicial</Button>
           </Link>
         </div>
       </div>

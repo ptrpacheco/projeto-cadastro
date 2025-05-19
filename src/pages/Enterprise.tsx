@@ -3,12 +3,12 @@ import NavBar from "../components/SideBar";
 import { axiosPrivate } from "../api/axiosConfig";
 import { useEffect, useState } from "react";
 import CrudContainer from "../components/CrudContainer";
-import InputText from "../components/Input/InputText";
-import Button from "../components/Button/Button";
+import InputText from "../components/inputTemp/InputText";
+import Button from "../components/buttonTemp/Button";
 import type { EnterpriseData } from "../interface/EnterpriseData";
-import InputTelephone from "../components/Input/InputTelephone";
+import InputTelephone from "../components/inputTemp/InputTelephone";
 import Line from "../components/Line";
-import InputSelect from "../components/Input/InputSelect";
+import InputSelect from "../components/inputTemp/InputSelect";
 import { UF } from "../constants/UF";
 import RequestError from "../components/Error/RequestError";
 import ErrorMessage from "../components/Error/ErrorMessage";
@@ -62,9 +62,9 @@ const Enterprise = () => {
         const response = await axiosPrivate.get("/empresa/8");
         setEnterpriseData(response.data.data);
         setRequestError(null);
-    } catch (error) {
-      setRequestError(error);
-    }
+      } catch (error) {
+        setRequestError(error);
+      }
     };
 
     fetchEnterpriseData();
@@ -89,12 +89,12 @@ const Enterprise = () => {
             </div>
             <div className="flex-1 overflow-y-auto flex flex-col p-4 gap-4">
               {requestError instanceof Error && (
-                  <RequestError
-                    error={requestError}
-                    customMessage="Erro ao carregar os clientes."
-                  />
-                )}
-                {formError && <ErrorMessage message={formError} />}
+                <RequestError
+                  error={requestError}
+                  customMessage="Erro ao carregar os clientes."
+                />
+              )}
+              {formError && <ErrorMessage message={formError} />}
               <div className="w-full flex flex-row gap-6">
                 <InputText
                   label="Nome da Empresa"

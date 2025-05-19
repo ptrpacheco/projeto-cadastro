@@ -1,39 +1,39 @@
 import { useEffect, useState } from "react";
 import { axiosPrivate } from "../../api/axiosConfig";
-import CancelButton from "../Button/CancelButton";
-import type { ProductData } from "../../interface/ProductData";
+import CancelButton from "../buttonTemp/CancelButton";
+import type { SupplierData } from "../../interface/SupplierData";
 import SearchBar from "../SearchBar";
 import RequestError from "../Error/RequestError";
 
-interface ProductModalProps {
+interface SupplierModalProps {
   open: boolean;
-  onSelect: (codigo: number) => void;
+  onSelect: (cpfOuCnpj: string) => void;
   onClose: () => void;
 }
 
-const ProductModal = ({ open, onClose, onSelect }: ProductModalProps) => {
+const SupplierModal = ({ open, onClose, onSelect }: SupplierModalProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [requestError, setRequestError] = useState<unknown | null>(null);
 
-  const [productList, setProductList] = useState<ProductData[]>([]);
+  const [supplierList, setSupplierList] = useState<SupplierData[]>([]);
 
   const handleSearch = async () => {
     try {
       setIsLoading(true);
-      const response = await axiosPrivate.get(`/produto/nome/${searchTerm}`);
+      const response = await axiosPrivate.get(`/fornecedor/nome/${searchTerm}`);
       const data = response.data.data;
       setRequestError(null);
       if (Array.isArray(data)) {
-        setProductList(data);
+        setSupplierList(data);
       } else if (data) {
-        setProductList([data]);
+        setSupplierList([data]);
       } else {
-        setProductList([]);
+        setSupplierList([]);
       }
     } catch (error) {
       setRequestError(error);
-      setProductList([]);
+      setSupplierList([]);
     } finally {
       setIsLoading(false);
     }
@@ -42,8 +42,8 @@ const ProductModal = ({ open, onClose, onSelect }: ProductModalProps) => {
   const fetchAllPosts = async () => {
     setIsLoading(true);
     try {
-      const response = await axiosPrivate.get("/produto");
-      setProductList(response.data.data);
+      const response = await axiosPrivate.get("/fornecedor");
+      setSupplierList(response.data.data);
       setRequestError(null);
     } catch (error) {
       setRequestError(error);
@@ -55,10 +55,10 @@ const ProductModal = ({ open, onClose, onSelect }: ProductModalProps) => {
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        const response = await axiosPrivate.get("/produto");
-        setProductList(response.data.data);
+        const response = await axiosPrivate.get("/fornecedor");
+        setSupplierList(response.data.data);
       } catch (error) {
-        console.error("Erro ao buscar lista de clientes:", error);
+        console.error("Erro ao buscar lista de fornecedores:", error);
       }
     };
     fetchClients();
@@ -79,40 +79,42 @@ const ProductModal = ({ open, onClose, onSelect }: ProductModalProps) => {
           <div className="flex flex-row items-center gap-2">
             <CancelButton onClick={onClose} />
             <h1 className="font-poppins font-semibold text-xl text-main">
-              Selecionar Produto
+              Selecionar Fornecedor
             </h1>
             {requestError instanceof Error && (
               <RequestError
                 error={requestError}
-                customMessage="Erro ao carregar os produtos."
+                customMessage="Erro ao carregar os fornecedores."
               />
             )}
           </div>
-            <SearchBar
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onSearch={handleSearch}
-              onClear={() => {
-                setSearchTerm("");
-                fetchAllPosts();
-              }}
-            />
+          <SearchBar
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onSearch={handleSearch}
+            onClear={() => {
+              setSearchTerm("");
+              fetchAllPosts();
+            }}
+          />
         </div>
         {isLoading ? (
           <div className="w-full py-10 flex items-center justify-center">
             <p className="text-sm font-poppins text-gray">Carregando...</p>
           </div>
-        ) : productList.length ? (
+        ) : supplierList.length ? (
           <ul className="h-full max-h-128 grow-0 flex flex-col overflow-y-auto">
-            {productList.map((f, index) => (
+            {supplierList.map((s, index) => (
               <li
                 key={index}
-                onClick={() => onSelect(f.codigo)}
+                onClick={() => onSelect(s.cpfOuCnpj)}
                 className="w-full flex flex-row items-center justify-between p-4 border-b border-gray duration-200 cursor-pointer hover:bg-background"
               >
                 <div className="w-full flex flex-row justify-between">
-                  <span className="text-sm truncate font-semibold">{f.nome}</span>
-                  <span className="text-sm truncate">{f.familia.nome}</span>
+                  <span className="text-sm truncate font-semibold">
+                    {s.nomeOuRazaoSocial}
+                  </span>
+                  <span className="text-sm truncate">{s.cpfOuCnpj}</span>
                 </div>
               </li>
             ))}
@@ -129,4 +131,4 @@ const ProductModal = ({ open, onClose, onSelect }: ProductModalProps) => {
   );
 };
 
-export default ProductModal;
+export default SupplierModal;

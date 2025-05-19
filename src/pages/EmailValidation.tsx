@@ -1,6 +1,6 @@
 import { LogoBlackHorizontal } from "../assets";
 import { Link } from "react-router-dom";
-import Button from "../components/Button/Button";
+import Button from "../components/buttonTemp/Button";
 
 const EmailValidation = () => {
   return (
