@@ -8,11 +8,11 @@ const SideBar = () => {
       <ul className="font-poppins text-md">
         {Navigation.map((item, index) => {
           return (
-            <Link to={item.path}>
-              <li
-                key={index}
-                className="w-full flex flex-row items-center px-8 py-4 bg-white border-b border-gray cursor-pointer hover:bg-main hover:font-semibold"
-              >
+            <Link 
+              to={item.path} 
+              key={`nav-top-${index}`}
+            >
+              <li className="w-full flex flex-row items-center px-8 py-4 bg-white border-b border-gray cursor-pointer hover:bg-main hover:font-semibold">
                 <span>{item.title}</span>
               </li>
             </Link>
@@ -22,11 +22,11 @@ const SideBar = () => {
       <ul className="font-poppins text-md">
         {NavigationBottom.map((item, index) => {
           return (
-            <Link to={item.path}>
-              <li
-                key={index}
-                className="w-full flex flex-row items-center px-8 py-4 bg-white border-t border-gray cursor-pointer hover:bg-main hover:font-semibold"
-              >
+            <Link 
+              to={item.path} 
+              key={`nav-bottom-${index}`}
+            >
+              <li className="w-full flex flex-row items-center px-8 py-4 bg-white border-t border-gray cursor-pointer hover:bg-main hover:font-semibold">
                 <span>{item.title}</span>
               </li>
             </Link>

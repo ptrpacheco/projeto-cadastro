@@ -107,7 +107,7 @@ const InputProduct = ({ value, onChange }: InputProductProps) => {
       />
       <div className="w-full flex flex-col gap-4">
         {products.map((product, index) => (
-          <div key={index} className="flex flex-col gap-1">
+          <div key={`${product.produtoId}-${index}`} className="flex flex-col gap-1">
             <div className="w-full flex flex-row gap-2 items-end">
               <div className="w-full flex flex-col gap-1">
                 {index === 0 && (

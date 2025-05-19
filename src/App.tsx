@@ -26,7 +26,7 @@ function App() {
         localStorage.setItem("ACCESS_TOKEN", response.data);
         navigate("/clientes");
       })
-      .catch((error) => {
+      .catch(() => {
         setError("Email ou senha inválidos.");
       });
   };

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import { LogoBlack } from "../assets";
 import { axiosPrivate } from "../api/axiosConfig";
 import type { EnterpriseData } from "../interface/EnterpriseData";
@@ -46,23 +46,23 @@ const Header = () => {
       ) : posts?.length ? (
         <ul className="w-full h-12 grow-0 flex flex-row items-center justify-around">
           {posts.map((enterprise, index) => (
-            <>
-              <li key={index} className="font-poppins text-xs text-center">{enterprise.nomeFantasia}</li>
-              <li key={index} className="font-poppins text-xs text-center">{enterprise.razaoSocial}</li>
-              <li key={index} className="font-poppins text-xs text-center">{enterprise.cnpj}</li>
-              <li key={index} className="font-poppins text-xs text-center">
+            <Fragment key={index}>
+              <li className="font-poppins text-xs text-center">{enterprise.nomeFantasia}</li>
+              <li className="font-poppins text-xs text-center">{enterprise.razaoSocial}</li>
+              <li className="font-poppins text-xs text-center">{enterprise.cnpj}</li>
+              <li className="font-poppins text-xs text-center">
                 {enterprise.endereco?.enderecoFormatado ??
                   "Endereço não disponível"}
               </li>
-              <li key={index} className="font-poppins text-xs text-center">{enterprise.email}</li>
-              <li key={index} className="font-poppins text-xs text-center">
+              <li className="font-poppins text-xs text-center">{enterprise.email}</li>
+              <li className="font-poppins text-xs text-center">
                 {enterprise.telefones.map((tel, i) => (
                   <span key={i}>
                     ({tel.ddd}) {tel.numero}{" "}
                   </span>
                 ))}
               </li>
-            </>
+            </Fragment>
           ))}
         </ul>
       ) : (

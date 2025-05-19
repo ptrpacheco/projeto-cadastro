@@ -186,17 +186,53 @@ const Services = () => {
     }
   };
 
-  const fetchPostById = async (codigo: number) => {
-    try {
-      const response = await axiosPrivate.get(`/servico/${codigo}`);
-      setServiceData(response.data.data);
-      setPostToEditId(codigo);
-      setUserState("edit");
-      setRequestError(null);
-    } catch (error) {
-      setRequestError(error);
-    }
-  };
+const fetchPostById = async (codigo: number) => {
+  try {
+    const response = await axiosPrivate.get(`/servico/${codigo}`);
+    const data = response.data.data;
+    
+    // Converter valores numéricos e garantir produtoId
+    const processedData = {
+      ...data,
+      precoTotal: typeof data.precoTotal === 'string' 
+        ? parseFloat(data.precoTotal) 
+        : data.precoTotal,
+      precoTotalComDesconto: typeof data.precoTotalComDesconto === 'string'
+        ? parseFloat(data.precoTotalComDesconto)
+        : data.precoTotalComDesconto,
+      maoDeObra: {
+        ...data.maoDeObra,
+        preco: typeof data.maoDeObra.preco === 'string'
+          ? parseFloat(data.maoDeObra.preco)
+          : data.maoDeObra.preco
+      },
+      itens: data.itens.map((item: any) => ({
+        produtoId: item.produtoId || item.produto?.codigo || 0,
+        produto: item.produto || null,
+        quantidade: item.quantidade || 0,
+        precoUnitario: typeof item.precoUnitario === 'string'
+          ? parseFloat(item.precoUnitario)
+          : item.precoUnitario || 0,
+        precoTotalItem: typeof item.precoTotalItem === 'string'
+          ? parseFloat(item.precoTotalItem)
+          : item.precoTotalItem || 0
+      })),
+      desconto: {
+        ...data.desconto,
+        valor: typeof data.desconto.valor === 'string'
+          ? parseFloat(data.desconto.valor)
+          : data.desconto.valor || 0
+      }
+    };
+    
+    setServiceData(processedData);
+    setPostToEditId(codigo);
+    setUserState("edit");
+    setRequestError(null);
+  } catch (error) {
+    setRequestError(error);
+  }
+};
 
   const downloadPDF = async (codigoServico: number) => {
     try {
@@ -245,18 +281,18 @@ const Services = () => {
     }
   };
 
-  const preparePayload = (serviceData: ServiceData) => {
-    return {
-      ...serviceData,
-      cliente: serviceData.cliente.cpfOuCnpj,
-      itens: serviceData.itens.map((item) => ({
-        produtoId: item.produtoId,
-        quantidade: item.quantidade,
-        precoUnitario: item.precoUnitario,
-        precoTotalItem: item.precoTotalItem,
-      })),
-    };
+const preparePayload = (serviceData: ServiceData) => {
+  return {
+    ...serviceData,
+    cliente: serviceData.cliente.cpfOuCnpj,
+    itens: serviceData.itens.map((item) => ({
+      produtoId: item.produtoId || (item.produto ? item.produto.codigo : 0),
+      quantidade: item.quantidade,
+      precoUnitario: item.precoUnitario,
+      precoTotalItem: item.precoTotalItem,
+    })),
   };
+};
 
   const handleAddPost = async () => {
     try {
@@ -486,7 +522,10 @@ const Services = () => {
                             {ServiceData.maoDeObra.descricao}
                           </span>
                           <span className="text-sm basis-24 truncate">
-                            R$ {ServiceData.precoTotalComDesconto}
+                            R${" "}
+                            {Number(ServiceData.precoTotalComDesconto) % 1 === 0
+                              ? ServiceData.precoTotalComDesconto.toFixed(0)
+                              : ServiceData.precoTotalComDesconto.toFixed(2)}
                           </span>
                           <span className="text-sm basis-32 truncate">
                             {ServiceData.dataCriacao}
