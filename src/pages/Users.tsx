@@ -13,10 +13,12 @@ import { CategoriaUsuario } from "../constants/CategoriaUsuario";
 import RequestError from "../components/Error/RequestError";
 import ErrorMessage from "../components/Error/ErrorMessage";
 import axios from "axios";
+import SuccessMessage from "../components/Error/SuccessMessage";
 
 const Users = () => {
   const [requestError, setRequestError] = useState<Error | null>(null);
   const [formError, setFormError] = useState<string>("");
+  const [formSuccess, setFormSuccess] = useState<string>("");
 
   const [userData, setUserData] = useState<UserData>({
     nomeUsuario: "",
@@ -28,7 +30,7 @@ const Users = () => {
   const handleAddPost = async () => {
     try {
       const response = await axiosPrivate.post("/auth/register", userData);
-      console.log("Usuário criado:", response.data);
+      setFormSuccess("Usuário criado com sucesso")
       setUserData({ nomeUsuario: "", email: "", senha: "", categoria: "" });
       setFormError("");
       setRequestError(null);
@@ -40,8 +42,10 @@ const Users = () => {
             ? apiMessage
             : "Erro ao adicionar usuário."
         );
+        setFormSuccess("")
         setRequestError(error);
       } else {
+        setFormSuccess("")
         setFormError("Erro desconhecido ao adicionar usuário.");
         setRequestError(error as Error);
       }
@@ -56,6 +60,7 @@ const Users = () => {
 
     try {
       await axiosPrivate.delete(`/auth/delete/${userData.email}`);
+      setFormSuccess("")
       setFormError("");
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -65,8 +70,10 @@ const Users = () => {
             ? apiMessage
             : "Erro ao deletar usuário."
         );
+        setFormSuccess("")
         setRequestError(error);
       } else {
+        setFormSuccess("")
         setFormError("Erro desconhecido ao deletar usuário.");
         setRequestError(error as Error);
       }
@@ -98,6 +105,7 @@ const Users = () => {
                 />
               )}
               {formError && <ErrorMessage message={formError} />}
+              {formSuccess && <SuccessMessage message={formSuccess} />}
 
               <div className="w-full flex flex-row gap-6">
                 <InputText
